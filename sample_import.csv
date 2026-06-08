@@ -1,0 +1,7 @@
+sku,name,category,unit_price,reorder_point,reorder_qty,stock_main
+ELEC-100,Smart LED Bulb Pack,Electronics,24.99,50,200,150
+ELEC-101,Extension Cord 6-outlet,Electronics,19.99,40,150,80
+FURN-100,Desk Lamp Adjustable,Furniture,59.99,20,80,45
+CLTH-100,Waterproof Jacket M,Clothing,89.99,15,60,30
+FOOD-100,Whey Protein 1kg,Food & Beverage,34.99,80,300,200
+TOOL-100,Hammer 16oz,Tools & Hardware,29.99,30,100,65
