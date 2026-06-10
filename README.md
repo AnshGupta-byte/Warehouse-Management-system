@@ -1,85 +1,22 @@
-# WarehouseAI — Fullstack AI Warehouse Management System
+# WarehouseAI - AI-Powered Warehouse Management System
 
-A production-grade WMS with AI demand forecasting, real-time inventory tracking, and Gemini-powered natural language insights.
+An enterprise-grade, multi-service Warehouse Management System (WMS) built using React, Express, Python FastAPI, and PostgreSQL. It incorporates seasonal demand forecasting models, smart safety-stock calculators, interactive warehouse heatmap grids, live WebSocket notifications, and retrieval-augmented (RAG) conversational query chatbots.
 
-## 🚀 Quick Start
+## Features Checklist
+- **Authentication**: JWT authentication with Role-Based Access Control (Admin, Manager, Staff).
+- **Inventory Control**: Automatic SKU generation, multi-warehouse stock level, location placements (aisle, shelf, bin).
+- **Order Pipelines**: Inbound POs and Outbound SOs. Stock levels balance dynamically when orders are marked as fulfilled (`DELIVERED`).
+- **Aesthetic Heatmap**: Interactive slot density grids showing space occupancy.
+- **AI Demand Forecasting**: Seasonal Linear Regression pipeline delivering 30, 60, and 90-day predictions.
+- **Smart PO Reorder Engine**: Safety stock and ROP estimation matrixes that generate replenishment recommendations.
+- **AI Chatbot**: Real-time context RAG conversational querying powered by Gemini.
+- **WebSocket Broadcasts**: Live updates on alerts, stocks, and order changes.
+- **Dockerization**: Ready-to-go `docker-compose.yml` for database, backends, and frontends.
 
-### Prerequisites
-- Node.js 18+
-- Python 3.10+
-- PostgreSQL running locally
+## Folder Layout
+- `frontend/`: Vite + React + TypeScript + Tailwind CSS application.
+- `backend/`: Node.js + Express + TypeScript + Prisma API server.
+- `ai-service/`: Python FastAPI microservice containing forecasting pipelines and Gemini chatbot bindings.
 
-### 1. Configure Environment
-Edit `.env.local` with your credentials:
-```env
-DATABASE_URL="postgresql://postgres:YOUR_PASSWORD@localhost:5432/warehouse_db"
-NEXTAUTH_SECRET="any-random-32-char-string"
-GEMINI_API_KEY="your-gemini-api-key"  # from https://aistudio.google.com
-AI_SERVICE_URL="http://localhost:8000"
-```
-
-### 2. Set Up Database
-```bash
-# Generate Prisma client + push schema + seed data
-npm run db:setup
-```
-
-### 3. Start Python AI Service
-```bash
-cd python-ai
-pip install -r requirements.txt
-uvicorn main:app --reload --port 8000
-```
-
-> **Note:** Prophet installation may take a few minutes. If it fails, the app will fall back to an exponential smoothing model automatically.
-
-### 4. Start Next.js App
-```bash
-npm run dev
-```
-
-Open http://localhost:3000
-
-## 🔐 Demo Credentials
-| Role | Email | Password |
-|------|-------|----------|
-| Admin | admin@warehouse.com | admin123 |
-| Manager | manager@warehouse.com | manager123 |
-
-## 📁 Project Structure
-```
-warehouse-ai/
-├── app/
-│   ├── (app)/           # Protected app pages (auth required)
-│   │   ├── dashboard/   # KPI cards, charts
-│   │   ├── inventory/   # Product table, CSV import
-│   │   ├── orders/      # Purchase & sales orders
-│   │   ├── forecasting/ # AI demand forecasting
-│   │   └── alerts/      # Smart alerts
-│   ├── api/             # API routes
-│   └── login/           # Auth page
-├── components/
-│   ├── Sidebar.tsx      # Navigation sidebar
-│   └── AIChat.tsx       # Gemini chat widget
-├── python-ai/           # FastAPI + Prophet service
-│   ├── main.py
-│   ├── forecaster.py
-│   └── requirements.txt
-└── prisma/
-    ├── schema.prisma
-    └── seed.ts
-```
-
-## 🤖 AI Features
-- **Demand Forecasting**: Prophet ML model with 80% confidence intervals
-- **Gemini Chat**: Natural language inventory queries with live DB context
-- **Anomaly Detection**: IQR + Z-score hybrid on stock movements
-- **Smart Alerts**: Auto-generated low stock / stockout risk warnings
-
-## 📊 Tech Stack
-- Next.js 14 (App Router) + TypeScript
-- PostgreSQL + Prisma ORM
-- NextAuth.js v5
-- Python FastAPI + Prophet
-- Google Gemini API
-- Recharts
+## How to Get Started
+To deploy or run the stack, please refer to the detailed [Deployment & Setup Guide](file:///C:/Users/anshg/.gemini/antigravity/scratch/warehouse-ai/deployment-guide.md).

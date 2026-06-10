@@ -1,0 +1,142 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      String   @default("STAFF") // ADMIN, MANAGER, STAFF
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  color    String    @default("#3b82f6")
+  products Product[]
+}
+
+model Warehouse {
+  id             String          @id @default(cuid())
+  name           String
+  location       String
+  capacity       Int
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  stockLevels    StockLevel[]
+  stockMovements StockMovement[]
+  alerts         Alert[]
+}
+
+model Product {
+  id             String          @id @default(cuid())
+  sku            String          @unique
+  name           String
+  description    String?
+  categoryId     String
+  category       Category        @relation(fields: [categoryId], references: [id])
+  unit           String          @default("units")
+  unitPrice      Float
+  reorderPoint   Int             @default(10)
+  reorderQty     Int             @default(50)
+  safetyStock    Int             @default(5)
+  barcodeUrl     String?
+  qrCodeUrl      String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  stockLevels    StockLevel[]
+  stockMovements StockMovement[]
+  orderItems     OrderItem[]
+  forecasts      ForecastResult[]
+  alerts         Alert[]
+}
+
+model StockLevel {
+  id          String    @id @default(cuid())
+  productId   String
+  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  warehouseId String
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  quantity    Int       @default(0)
+  aisle       String?   // Aisle code e.g. "A", "B"
+  shelf       String?   // Shelf identifier e.g. "01", "02"
+  bin         String?   // Bin slot e.g. "12", "13"
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([productId, warehouseId])
+}
+
+model StockMovement {
+  id          String    @id @default(cuid())
+  productId   String
+  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  warehouseId String
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  type        String    // IN, OUT, ADJUSTMENT
+  quantity    Int
+  reason      String?
+  reference   String?
+  date        DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  orderNumber String      @unique
+  type        String      // PURCHASE, SALES
+  status      String      @default("PENDING") // PENDING, CONFIRMED, SHIPPED, DELIVERED, CANCELLED
+  supplier    String?     // For Purchase Orders
+  customer    String?     // For Sales Orders
+  totalAmount Float       @default(0)
+  orderDate   DateTime    @default(now())
+  expectedAt  DateTime?
+  deliveredAt DateTime?
+  notes       String?
+  items       OrderItem[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity  Int
+  unitPrice Float
+  total     Float
+}
+
+model ForecastResult {
+  id           String   @id @default(cuid())
+  productId    String
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  forecastDate DateTime
+  predictedQty Float
+  confidence   Float    @default(0.85) // confidence score from model
+  generatedAt  DateTime @default(now())
+}
+
+model Alert {
+  id          String     @id @default(cuid())
+  productId   String?
+  product     Product?   @relation(fields: [productId], references: [id], onDelete: SetNull)
+  warehouseId String?
+  warehouse   Warehouse? @relation(fields: [warehouseId], references: [id], onDelete: SetNull)
+  type        String     // LOW_STOCK, OVERSTOCK, DEMAND_SPIKE, STOCKOUT_RISK
+  severity    String     // CRITICAL, WARNING, INFO
+  title       String
+  message     String
+  isRead      Boolean    @default(false)
+  isResolved  Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+}

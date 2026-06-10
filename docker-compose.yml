@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: wms_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: warehouse_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: wms_backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/warehouse_db?schema=public
+      - NEXTAUTH_SECRET=warehouse-ai-super-secret-key-2024-change-me
+      - AI_SERVICE_URL=http://ai-service:8000
+    depends_on:
+      - db
+
+  ai-service:
+    build: ./ai-service
+    container_name: wms_ai_service
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - GEMINI_API_KEY=${GEMINI_API_KEY}   # set in .env file — never commit real keys
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    container_name: wms_frontend
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
