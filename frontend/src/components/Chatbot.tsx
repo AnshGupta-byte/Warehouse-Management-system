@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { api } from '../services/api';
 import {
-  MessageSquare, X, Send, Sparkles, ChevronDown,
-  Bot, User, Table, AlertTriangle, Package,
-  BarChart2, ShoppingCart, Boxes,
+  MessageSquare, X, Send, Cpu, Table,
+  AlertTriangle, Package, BarChart2, ShoppingCart, Boxes,
+  Trash2,
 } from 'lucide-react';
 
 interface TableData {
@@ -29,26 +29,33 @@ const QUICK_QUERIES = [
 ];
 
 const DataTable: React.FC<{ tableData: TableData }> = ({ tableData }) => (
-  <div className="mt-2 overflow-x-auto rounded-lg border border-slate-700 max-w-full">
-    <table className="text-xs w-full min-w-max">
+  <div className="mt-2 overflow-x-auto rounded-md border border-[#1e2d45] max-w-full">
+    <table className="text-[11px] w-full min-w-max">
       <thead>
-        <tr className="bg-slate-800/80">
+        <tr className="bg-[#0b1120]">
           {tableData.headers.map((h, i) => (
-            <th key={i} className="text-left px-3 py-2 text-slate-400 font-semibold uppercase tracking-wider whitespace-nowrap">{h}</th>
+            <th
+              key={i}
+              className="text-left px-3 py-2 text-[10px] font-semibold tracking-widest text-[#4a5f7a] uppercase whitespace-nowrap border-b border-[#1e2d45]"
+            >
+              {h}
+            </th>
           ))}
         </tr>
       </thead>
       <tbody>
         {tableData.rows.map((row, ri) => (
-          <tr key={ri} className="border-t border-slate-700/50 hover:bg-slate-700/20 transition-colors">
+          <tr key={ri} className="border-t border-[#1a2840] hover:bg-[#0f1729] transition-colors">
             {row.map((cell, ci) => (
-              <td key={ci} className="px-3 py-2 text-slate-300 whitespace-nowrap">{String(cell)}</td>
+              <td key={ci} className="px-3 py-2 text-[#cbd5e1] whitespace-nowrap font-mono">
+                {String(cell)}
+              </td>
             ))}
           </tr>
         ))}
       </tbody>
     </table>
-    <div className="px-3 py-1.5 bg-slate-800/50 text-[10px] text-slate-500 border-t border-slate-700">
+    <div className="px-3 py-1.5 bg-[#0b1120] text-[10px] text-[#4a5f7a] border-t border-[#1e2d45] tracking-wide">
       {tableData.rows.length} records
     </div>
   </div>
@@ -57,36 +64,35 @@ const DataTable: React.FC<{ tableData: TableData }> = ({ tableData }) => (
 const MessageBubble: React.FC<{ msg: Message }> = ({ msg }) => {
   const isUser = msg.role === 'user';
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4 animate-in fade-in-0 slide-in-from-bottom-2`}>
+    <div className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}>
       {!isUser && (
-        <div className="h-7 w-7 rounded-full bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center mr-2 flex-shrink-0 mt-1">
-          <Bot className="h-3.5 w-3.5 text-indigo-400" />
-        </div>
+        <span className="mb-1 inline-flex items-center px-1.5 py-0.5 rounded-sm bg-[#1d4ed820] border border-[#1d4ed840] text-[9px] font-semibold text-[#3b82f6] tracking-widest uppercase">
+          AI
+        </span>
       )}
-      <div className={`max-w-[85%] ${isUser ? 'order-1' : ''}`}>
-        <div className={`rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+      <div
+        className={`${
           isUser
-            ? 'bg-indigo-600 text-white rounded-br-sm'
-            : 'bg-slate-800 border border-slate-700 text-slate-200 rounded-bl-sm'
-        }`}>
-          {msg.type !== 'text' && msg.tableData && (
-            <div className="flex items-center space-x-1.5 mb-2 text-indigo-400">
-              <Table className="h-3.5 w-3.5" />
-              <span className="text-xs font-semibold uppercase tracking-wider">Structured Data</span>
-            </div>
-          )}
-          <p className="whitespace-pre-wrap">{msg.content}</p>
-          {msg.tableData && <DataTable tableData={msg.tableData} />}
-        </div>
-        <p className={`text-[10px] text-slate-600 mt-1 ${isUser ? 'text-right' : ''}`}>
-          {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            ? 'ml-8 bg-[#1d4ed820] border border-[#1d4ed840]'
+            : 'mr-8 bg-[#0f1729] border border-[#1e2d45]'
+        } rounded-lg p-3 text-[12px] leading-relaxed max-w-full`}
+      >
+        {msg.type !== 'text' && msg.tableData && (
+          <div className="flex items-center space-x-1.5 mb-2">
+            <Table className="h-3 w-3 text-[#3b82f6]" />
+            <span className="text-[10px] font-semibold tracking-widest text-[#3b82f6] uppercase">
+              Structured Data
+            </span>
+          </div>
+        )}
+        <p className={`whitespace-pre-wrap ${isUser ? 'text-[#cbd5e1]' : 'text-[#94a3b8]'}`}>
+          {msg.content}
         </p>
+        {msg.tableData && <DataTable tableData={msg.tableData} />}
       </div>
-      {isUser && (
-        <div className="h-7 w-7 rounded-full bg-slate-700 border border-slate-600 flex items-center justify-center ml-2 flex-shrink-0 mt-1">
-          <User className="h-3.5 w-3.5 text-slate-300" />
-        </div>
-      )}
+      <p className={`text-[9px] text-[#2d4060] mt-1 ${isUser ? 'text-right' : ''}`}>
+        {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+      </p>
     </div>
   );
 };
@@ -163,74 +169,48 @@ export const Chatbot: React.FC = () => {
       {/* Floating Toggle Button */}
       <button
         onClick={() => setOpen(!open)}
-        className={`fixed bottom-6 right-6 z-40 h-14 w-14 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 ${
-          open ? 'bg-slate-700 border-slate-600' : 'bg-indigo-600 hover:bg-indigo-500 shadow-indigo-500/30'
-        } border`}
+        className="fixed bottom-6 right-6 z-30 h-7 w-7 rounded-md bg-[#1d4ed8] hover:bg-[#2563eb] border border-[#2563eb] flex items-center justify-center transition-colors"
         aria-label={open ? 'Close chat' : 'Open AI Assistant'}
       >
-        {open ? (
-          <ChevronDown className="h-6 w-6 text-white" />
-        ) : (
-          <div className="relative">
-            <MessageSquare className="h-6 w-6 text-white" />
-            <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-emerald-400 animate-pulse ring-2 ring-slate-950" />
-          </div>
-        )}
+        <MessageSquare className="h-4 w-4 text-white" />
       </button>
 
-      {/* Chat Window */}
+      {/* Chat Panel */}
       {open && (
-        <div className="fixed bottom-24 right-6 z-40 w-[420px] max-h-[620px] bg-slate-950 border border-slate-800 rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 fade-in-0 duration-200">
+        <div className="fixed bottom-[72px] right-6 z-30 w-96 h-[520px] bg-[#0b1120] border border-[#1e2d45] rounded-lg shadow-2xl flex flex-col overflow-hidden animate-in fade-in-0 slide-in-from-bottom-2 duration-150">
+
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3.5 border-b border-slate-800 bg-slate-900/80 backdrop-blur-sm flex-shrink-0">
-            <div className="flex items-center space-x-3">
-              <div className="relative h-8 w-8 rounded-full bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center">
-                <Sparkles className="h-4 w-4 text-indigo-400" />
-                <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-emerald-400 ring-1 ring-slate-900" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-white">WarehouseAI Assistant</p>
-                <p className="text-[10px] text-emerald-400 font-medium">● Online · Gemini Powered</p>
-              </div>
-            </div>
+          <div className="flex items-center justify-between px-4 py-3 border-b border-[#1e2d45] flex-shrink-0">
             <div className="flex items-center space-x-2">
+              <Cpu className="h-4 w-4 text-[#3b82f6] flex-shrink-0" />
+              <span className="text-[13px] font-semibold text-white leading-none">
+                WarehouseAI Assistant
+              </span>
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded-sm bg-[#1d4ed820] border border-[#1d4ed840] text-[9px] font-semibold text-[#3b82f6] tracking-widest uppercase leading-none">
+                Gemini 2.0 Flash
+              </span>
+            </div>
+            <div className="flex items-center space-x-1">
               <button
                 onClick={() => setMessages([messages[0]])}
-                className="text-[10px] text-slate-500 hover:text-slate-300 px-2 py-1 rounded hover:bg-slate-800 transition-all"
+                className="p-1.5 rounded-md hover:bg-[#0f1729] text-[#4a5f7a] hover:text-[#94a3b8] transition-colors"
+                title="Clear history"
               >
-                Clear
+                <Trash2 className="h-3.5 w-3.5" />
               </button>
-              <button onClick={() => setOpen(false)} className="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors">
+              <button
+                onClick={() => setOpen(false)}
+                className="p-1.5 rounded-md hover:bg-[#0f1729] text-[#4a5f7a] hover:text-[#94a3b8] transition-colors"
+                title="Close"
+              >
                 <X className="h-4 w-4" />
               </button>
             </div>
           </div>
 
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-0 min-h-0" style={{ maxHeight: '380px' }}>
-            {messages.map((msg) => (
-              <MessageBubble key={msg.id} msg={msg} />
-            ))}
-            {loading && (
-              <div className="flex justify-start mb-4">
-                <div className="h-7 w-7 rounded-full bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center mr-2 flex-shrink-0">
-                  <Bot className="h-3.5 w-3.5 text-indigo-400" />
-                </div>
-                <div className="bg-slate-800 border border-slate-700 rounded-2xl rounded-bl-sm px-4 py-3">
-                  <div className="flex space-x-1.5 items-center">
-                    <div className="h-1.5 w-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <div className="h-1.5 w-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <div className="h-1.5 w-1.5 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                  </div>
-                </div>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Quick Query Chips */}
-          <div className="px-4 pb-2 flex-shrink-0">
-            <div className="flex space-x-2 overflow-x-auto pb-1 scrollbar-thin">
+          {/* Quick Chips */}
+          <div className="px-3 py-2 border-b border-[#111e35] flex-shrink-0">
+            <div className="flex space-x-1.5 overflow-x-auto pb-0.5 scrollbar-none">
               {QUICK_QUERIES.map((q) => {
                 const Icon = q.icon;
                 return (
@@ -238,9 +218,9 @@ export const Chatbot: React.FC = () => {
                     key={q.label}
                     onClick={() => sendMessage(q.query)}
                     disabled={loading}
-                    className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700 hover:border-indigo-500/50 hover:bg-slate-700 text-xs text-slate-300 hover:text-white transition-all whitespace-nowrap flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center space-x-1 text-[10px] font-medium px-2.5 py-1 rounded-sm border border-[#1e2d45] bg-[#0f1729] text-[#94a3b8] hover:border-[#3b82f6] hover:text-[#60a5fa] whitespace-nowrap flex-shrink-0 transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                   >
-                    <Icon className="h-3 w-3 text-indigo-400" />
+                    <Icon className="h-3 w-3 flex-shrink-0" />
                     <span>{q.label}</span>
                   </button>
                 );
@@ -248,27 +228,52 @@ export const Chatbot: React.FC = () => {
             </div>
           </div>
 
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3 min-h-0">
+            {messages.map((msg) => (
+              <MessageBubble key={msg.id} msg={msg} />
+            ))}
+
+            {/* Typing Indicator */}
+            {loading && (
+              <div className="flex flex-col items-start">
+                <span className="mb-1 inline-flex items-center px-1.5 py-0.5 rounded-sm bg-[#1d4ed820] border border-[#1d4ed840] text-[9px] font-semibold text-[#3b82f6] tracking-widest uppercase">
+                  AI
+                </span>
+                <div className="mr-8 bg-[#0f1729] border border-[#1e2d45] rounded-lg px-4 py-3">
+                  <div className="flex space-x-1.5 items-center">
+                    <div className="h-1.5 w-1.5 bg-[#3b82f6] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <div className="h-1.5 w-1.5 bg-[#3b82f6] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <div className="h-1.5 w-1.5 bg-[#3b82f6] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+
           {/* Input */}
-          <div className="px-4 pb-4 flex-shrink-0">
-            <form onSubmit={handleSubmit} className="flex items-center space-x-2 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500/20 transition-all">
+          <div className="px-3 py-3 border-t border-[#1e2d45] flex-shrink-0">
+            <form onSubmit={handleSubmit} className="flex items-center space-x-2">
               <input
                 ref={inputRef}
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ask about inventory, orders, alerts..."
-                className="flex-1 bg-transparent text-sm text-white placeholder-slate-500 focus:outline-none"
+                className="flex-1 bg-[#070d19] border border-[#1e2d45] focus:border-[#243552] rounded-md px-3 py-2 text-[12px] text-white placeholder-[#4a5f7a] focus:outline-none transition-colors"
                 disabled={loading}
               />
               <button
                 type="submit"
                 disabled={!input.trim() || loading}
-                className="h-7 w-7 rounded-lg bg-indigo-600 hover:bg-indigo-500 flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
+                className="h-8 w-8 rounded-md bg-[#1d4ed8] hover:bg-[#2563eb] border border-[#2563eb] flex items-center justify-center flex-shrink-0 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <Send className="h-3.5 w-3.5 text-white" />
               </button>
             </form>
           </div>
+
         </div>
       )}
     </>

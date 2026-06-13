@@ -11,6 +11,8 @@ import {
   AlertCircle,
   X,
   Sparkles,
+  ChevronDown,
+  ChevronRight,
 } from 'lucide-react';
 
 export const Orders: React.FC = () => {
@@ -30,6 +32,9 @@ export const Orders: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
+
+  // Expanded rows
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
   // New Order Form
   const [newOrder, setNewOrder] = useState({
@@ -189,31 +194,84 @@ export const Orders: React.FC = () => {
 
   const steps = ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED'];
 
+  const getStatusBadgeClass = (status: string) => {
+    switch (status) {
+      case 'PENDING':   return 'badge badge-amber';
+      case 'CONFIRMED': return 'badge badge-blue';
+      case 'SHIPPED':   return 'badge badge-purple';
+      case 'DELIVERED': return 'badge badge-green';
+      case 'CANCELLED': return 'badge badge-red';
+      default:          return 'badge badge-gray';
+    }
+  };
+
+  const toggleRow = (id: string) => {
+    setExpandedRows((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  // Compact 4-dot pipeline stepper
+  const PipelineStepper = ({ status }: { status: string }) => {
+    if (status === 'CANCELLED') {
+      return <span className="badge badge-red">Cancelled</span>;
+    }
+    const currentIdx = steps.indexOf(status);
+    return (
+      <div className="flex items-center gap-0.5" style={{ width: 80 }}>
+        {steps.map((s, i) => {
+          const done = i <= currentIdx;
+          const current = i === currentIdx;
+          return (
+            <React.Fragment key={s}>
+              <div
+                title={s}
+                className={`h-2 w-2 rounded-full flex-shrink-0 transition-all ${
+                  done
+                    ? current
+                      ? 'bg-[#3b82f6] ring-2 ring-[#3b82f6]/30'
+                      : 'bg-[#3b82f6]'
+                    : 'bg-[#1e2d45]'
+                }`}
+              />
+              {i < steps.length - 1 && (
+                <div className={`h-px flex-1 ${i < currentIdx ? 'bg-[#3b82f6]' : 'bg-[#1e2d45]'}`} />
+              )}
+            </React.Fragment>
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
-    <div className="space-y-6">
-      {/* Filters and Actions */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex flex-wrap gap-3">
+    <div className="space-y-4">
+      {/* ── Toolbar ─────────────────────────────── */}
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="bg-slate-900 border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            className="bg-[#0b1120] border-[#1e2d45] text-[12px] text-[#cbd5e1] rounded-md px-3 py-1.5 h-8 border focus:border-[#3b82f6] outline-none"
+            style={{ width: 160 }}
           >
             <option value="">All Order Types</option>
-            <option value="PURCHASE">PO (Inbound Purchases)</option>
-            <option value="SALES">SO (Outbound Sales)</option>
+            <option value="PURCHASE">PO — Inbound</option>
+            <option value="SALES">SO — Outbound</option>
           </select>
 
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="bg-slate-900 border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-slate-300 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            className="bg-[#0b1120] border-[#1e2d45] text-[12px] text-[#cbd5e1] rounded-md px-3 py-1.5 h-8 border focus:border-[#3b82f6] outline-none"
+            style={{ width: 140 }}
           >
             <option value="">All Statuses</option>
             {steps.concat(['CANCELLED']).map((s) => (
-              <option key={s} value={s}>
-                {s}
-              </option>
+              <option key={s} value={s}>{s}</option>
             ))}
           </select>
         </div>
@@ -225,276 +283,329 @@ export const Orders: React.FC = () => {
             }
             setShowAddModal(true);
           }}
-          className="flex items-center space-x-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition-all shadow-lg shadow-indigo-500/10"
+          className="btn-primary"
         >
-          <Plus className="h-4 w-4" />
-          <span>New Order Entry</span>
+          <Plus className="h-3.5 w-3.5" />
+          New Order
         </button>
       </div>
 
-      {/* Order List */}
-      <div className="space-y-4">
+      {/* ── Orders Table ─────────────────────────── */}
+      <div className="panel">
+        <div className="panel-header">
+          <span className="panel-title">Order Management</span>
+          <span className="badge badge-gray">{orders.length} records</span>
+        </div>
+
         {loading ? (
-          <div className="p-8 text-center text-slate-500 bg-slate-900 border border-slate-800 rounded-xl">Loading orders list...</div>
+          <div className="py-16 text-center text-[#4a5f7a] text-[12px]">
+            <div className="spinner mx-auto mb-3" />
+            Loading orders…
+          </div>
         ) : orders.length === 0 ? (
-          <div className="p-8 text-center text-slate-500 bg-slate-900 border border-slate-800 rounded-xl">No orders logged in this cycle.</div>
+          <div className="py-16 text-center text-[#4a5f7a] text-[12px]">
+            No orders found for the selected filters.
+          </div>
         ) : (
-          orders.map((order) => {
-            const currentStepIdx = steps.indexOf(order.status);
-            return (
-              <div
-                key={order.id}
-                className="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-md hover:border-slate-700 transition-all text-left"
-              >
-                {/* Info Header */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4 mb-4">
-                  <div>
-                    <div className="flex items-center space-x-3">
-                      <span className="text-sm font-bold text-slate-200">{order.orderNumber}</span>
-                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                        order.type === 'PURCHASE' ? 'bg-indigo-950/40 text-indigo-400 border border-indigo-900/50' : 'bg-pink-950/40 text-pink-400 border border-pink-900/50'
-                      }`}>
-                        {order.type === 'PURCHASE' ? 'PO Inbound' : 'SO Outbound'}
-                      </span>
-                      <span className={`text-[10px] px-2 py-0.5 rounded font-semibold ${getStatusColor(order.status)}`}>
-                        {order.status}
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-400 mt-1.5">
-                      {order.type === 'PURCHASE' ? `Supplier: ${order.supplier}` : `Customer: ${order.customer}`}
-                      {order.expectedAt && ` • Estimated delivery: ${new Date(order.expectedAt).toLocaleDateString()}`}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center space-x-6">
-                    <div className="text-right">
-                      <span className="text-xs font-semibold text-slate-400">Total Value</span>
-                      <p className="text-lg font-extrabold text-white">${order.totalAmount.toLocaleString()}</p>
-                    </div>
-                    {order.status !== 'DELIVERED' && order.status !== 'CANCELLED' && (
-                      <button
-                        onClick={() => {
-                          setSelectedOrder(order);
-                          setStatusUpdate({ status: order.status, warehouseId: warehouses[0]?.id || '' });
-                          setShowStatusModal(true);
-                        }}
-                        className="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition-all shadow-md"
+          <div className="overflow-x-auto">
+            <table>
+              <thead>
+                <tr>
+                  <th style={{ width: 32 }} />
+                  <th>Order #</th>
+                  <th>Type</th>
+                  <th>Partner</th>
+                  <th>Date</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Pipeline</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orders.map((order) => {
+                  const isExpanded = expandedRows.has(order.id);
+                  return (
+                    <React.Fragment key={order.id}>
+                      <tr
+                        className="cursor-pointer"
+                        onClick={() => toggleRow(order.id)}
                       >
-                        Update Status
-                      </button>
-                    )}
-                  </div>
-                </div>
+                        {/* Expand chevron */}
+                        <td className="text-center px-2">
+                          {isExpanded
+                            ? <ChevronDown className="h-3.5 w-3.5 text-[#4a5f7a] mx-auto" />
+                            : <ChevronRight className="h-3.5 w-3.5 text-[#4a5f7a] mx-auto" />
+                          }
+                        </td>
 
-                {/* Stepper Pipeline */}
-                {order.status !== 'CANCELLED' && (
-                  <div className="my-6 hidden md:block">
-                    <div className="relative flex items-center justify-between">
-                      <div className="absolute left-0 right-0 h-0.5 bg-slate-800 z-0"></div>
-                      <div
-                        className="absolute left-0 h-0.5 bg-indigo-500 transition-all duration-300 z-0"
-                        style={{ width: `${(Math.max(0, currentStepIdx) / (steps.length - 1)) * 100}%` }}
-                      ></div>
+                        {/* ORDER # */}
+                        <td>
+                          <span className="mono text-[#60a5fa] font-medium">
+                            {order.orderNumber}
+                          </span>
+                        </td>
 
-                      {steps.map((step, idx) => {
-                        const isDone = idx <= currentStepIdx;
-                        const isCurrent = idx === currentStepIdx;
-                        return (
-                          <div key={step} className="relative z-10 flex flex-col items-center">
-                            <div
-                              className={`h-7 w-7 rounded-full flex items-center justify-center border transition-all ${
-                                isDone
-                                  ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-500/20'
-                                  : 'bg-slate-900 border-slate-800 text-slate-500'
-                              } ${isCurrent ? 'ring-2 ring-indigo-500 ring-offset-2 ring-offset-slate-900' : ''}`}
+                        {/* TYPE */}
+                        <td>
+                          {order.type === 'PURCHASE'
+                            ? <span className="badge badge-blue">PO</span>
+                            : <span className="badge badge-purple">SO</span>
+                          }
+                        </td>
+
+                        {/* PARTNER */}
+                        <td className="text-[12px] text-[#cbd5e1]">
+                          {order.type === 'PURCHASE' ? order.supplier : order.customer}
+                        </td>
+
+                        {/* DATE */}
+                        <td className="text-[11px] text-[#4a5f7a]">
+                          {order.expectedAt
+                            ? new Date(order.expectedAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
+                            : '—'}
+                        </td>
+
+                        {/* TOTAL */}
+                        <td>
+                          <span className="font-mono font-semibold text-white tabular-nums">
+                            ${order.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </span>
+                        </td>
+
+                        {/* STATUS */}
+                        <td>
+                          <span className={getStatusBadgeClass(order.status)}>
+                            {order.status}
+                          </span>
+                        </td>
+
+                        {/* PIPELINE */}
+                        <td onClick={(e) => e.stopPropagation()}>
+                          <PipelineStepper status={order.status} />
+                        </td>
+
+                        {/* ACTIONS */}
+                        <td onClick={(e) => e.stopPropagation()}>
+                          {order.status !== 'DELIVERED' && order.status !== 'CANCELLED' ? (
+                            <button
+                              className="btn-ghost text-[11px] text-[#60a5fa] hover:text-white"
+                              onClick={() => {
+                                setSelectedOrder(order);
+                                setStatusUpdate({ status: order.status, warehouseId: warehouses[0]?.id || '' });
+                                setShowStatusModal(true);
+                              }}
                             >
-                              {isDone && idx < currentStepIdx ? (
-                                <CheckCircle2 className="h-4 w-4" />
-                              ) : (
-                                <span className="text-xs font-bold">{idx + 1}</span>
+                              Update
+                            </button>
+                          ) : (
+                            <span className="text-[11px] text-[#4a5f7a]">—</span>
+                          )}
+                        </td>
+                      </tr>
+
+                      {/* Expanded sub-row: order items */}
+                      {isExpanded && (
+                        <tr>
+                          <td colSpan={9} className="p-0 bg-[#070d19]">
+                            <div className="px-8 py-3 border-t border-[#1e2d45]">
+                              <p className="section-label mb-2">Line Items</p>
+                              <table className="w-full">
+                                <thead>
+                                  <tr>
+                                    <th className="text-left">Product</th>
+                                    <th className="text-left">SKU</th>
+                                    <th className="text-right">Qty</th>
+                                    <th className="text-right">Unit Price</th>
+                                    <th className="text-right">Line Total</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {order.items.map((item: any) => (
+                                    <tr key={item.id}>
+                                      <td className="text-[#cbd5e1]">{item.product.name}</td>
+                                      <td><span className="mono text-[#4a5f7a]">{item.product.sku}</span></td>
+                                      <td className="text-right tabular-nums">{item.quantity}</td>
+                                      <td className="text-right tabular-nums font-mono">${item.unitPrice.toFixed(2)}</td>
+                                      <td className="text-right tabular-nums font-mono font-semibold text-white">${item.total.toFixed(2)}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                              {order.notes && (
+                                <p className="text-[11px] text-[#4a5f7a] mt-2 pt-2 border-t border-[#1e2d45]">
+                                  <span className="text-[#94a3b8] font-semibold">Remarks: </span>
+                                  {order.notes}
+                                </p>
                               )}
                             </div>
-                            <span className={`text-[10px] font-bold mt-2 ${isDone ? 'text-indigo-400' : 'text-slate-500'}`}>
-                              {step}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {/* Items Detail Dropdown */}
-                <div className="bg-slate-950/50 p-4 rounded-xl border border-slate-800/80 mt-4">
-                  <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Order Items</span>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {order.items.map((item: any) => (
-                      <div key={item.id} className="flex justify-between items-center text-xs border-b border-slate-900 pb-2 last:border-0 last:pb-0">
-                        <div className="text-slate-300 font-semibold">{item.product.name} <span className="text-[10px] text-slate-500">({item.product.sku})</span></div>
-                        <div className="text-slate-400">
-                          {item.quantity} Qty @ ${item.unitPrice.toFixed(2)} = <span className="font-bold text-slate-200">${item.total.toFixed(2)}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  {order.notes && (
-                    <div className="text-[10px] text-slate-500 border-t border-slate-900 pt-3 mt-3">
-                      <strong>Remarks: </strong> {order.notes}
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 
-      {/* New Order Entry Modal */}
+      {/* ── New Order Modal ──────────────────────── */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-          <div className="w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 text-left max-h-[90vh] flex flex-col">
-            <div className="flex justify-between items-center mb-6 pb-2 border-b border-slate-800">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center space-x-2">
-                <Sparkles className="h-4 w-4 text-indigo-400" />
-                <span>Create Order Intake / Dispatch Entry</span>
-              </h3>
-              <button onClick={() => setShowAddModal(false)} className="text-slate-400 hover:text-white">
-                <X className="h-5 w-5" />
+        <div className="modal-overlay">
+          <div className="modal w-full max-w-xl flex flex-col max-h-[90vh]">
+            {/* Header */}
+            <div className="modal-header flex-shrink-0">
+              <span className="modal-title">Create Order</span>
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="btn-ghost p-1 text-[#4a5f7a] hover:text-white"
+              >
+                <X className="h-4 w-4" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateOrder} className="space-y-4 overflow-y-auto flex-1 pr-1">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-1">Order Pipeline *</label>
-                  <select
-                    value={newOrder.type}
-                    onChange={(e) => setNewOrder((prev) => ({ ...prev, type: e.target.value }))}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-300 focus:outline-none"
-                  >
-                    <option value="PURCHASE">Purchase Order (Inbound PO)</option>
-                    <option value="SALES">Sales Order (Outbound SO)</option>
-                  </select>
+            {/* Body */}
+            <form onSubmit={handleCreateOrder} className="flex flex-col flex-1 overflow-hidden">
+              <div className="modal-body flex-1 overflow-y-auto space-y-4">
+                {/* Row 1: Type + Partner */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="section-label block mb-1.5">Order Type *</label>
+                    <select
+                      value={newOrder.type}
+                      onChange={(e) => setNewOrder((prev) => ({ ...prev, type: e.target.value }))}
+                    >
+                      <option value="PURCHASE">Purchase Order (Inbound)</option>
+                      <option value="SALES">Sales Order (Outbound)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="section-label block mb-1.5">
+                      {newOrder.type === 'PURCHASE' ? 'Supplier *' : 'Customer *'}
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={newOrder.partner}
+                      onChange={(e) => setNewOrder((prev) => ({ ...prev, partner: e.target.value }))}
+                      placeholder={newOrder.type === 'PURCHASE' ? 'e.g. Hansa Pharma Inc' : 'e.g. BestRetail Corp'}
+                    />
+                  </div>
                 </div>
+
+                {/* Row 2: Date + Notes */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="section-label block mb-1.5">Expected Date</label>
+                    <input
+                      type="date"
+                      value={newOrder.expectedAt}
+                      onChange={(e) => setNewOrder((prev) => ({ ...prev, expectedAt: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <label className="section-label block mb-1.5">Notes</label>
+                    <input
+                      type="text"
+                      value={newOrder.notes}
+                      onChange={(e) => setNewOrder((prev) => ({ ...prev, notes: e.target.value }))}
+                      placeholder="e.g. Standard terms, fragile cargo"
+                    />
+                  </div>
+                </div>
+
+                {/* Divider + Line Items */}
+                <hr className="divider" />
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-1">
-                    {newOrder.type === 'PURCHASE' ? 'Supplier Name *' : 'Customer Name *'}
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={newOrder.partner}
-                    onChange={(e) => setNewOrder((prev) => ({ ...prev, partner: e.target.value }))}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-650 focus:outline-none"
-                    placeholder={newOrder.type === 'PURCHASE' ? 'e.g. Hansa Pharma Inc' : 'e.g. BestRetail Corp'}
-                  />
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="section-label">Line Items</span>
+                    <button
+                      type="button"
+                      onClick={handleAddItem}
+                      className="btn-ghost text-[#3b82f6] hover:text-white text-[11px]"
+                    >
+                      <Plus className="h-3 w-3" />
+                      Add Line Item
+                    </button>
+                  </div>
+
+                  <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                    {orderItems.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center gap-2 bg-[#070d19] border border-[#1e2d45] rounded-md px-2 py-1.5"
+                      >
+                        {/* Product select */}
+                        <div className="flex-1">
+                          <select
+                            required
+                            value={item.productId}
+                            onChange={(e) => handleItemChange(idx, 'productId', e.target.value)}
+                            style={{ marginBottom: 0 }}
+                          >
+                            <option value="">Select product…</option>
+                            {products.map((p) => (
+                              <option key={p.id} value={p.id}>
+                                {p.name} (${p.unitPrice})
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* Qty */}
+                        <div style={{ width: 60 }}>
+                          <input
+                            type="number"
+                            required
+                            placeholder="Qty"
+                            value={item.quantity}
+                            onChange={(e) => handleItemChange(idx, 'quantity', e.target.value)}
+                            min="1"
+                            className="text-center"
+                          />
+                        </div>
+
+                        {/* Price */}
+                        <div style={{ width: 76 }}>
+                          <input
+                            type="number"
+                            step="0.01"
+                            required
+                            placeholder="Price"
+                            value={item.unitPrice}
+                            onChange={(e) => handleItemChange(idx, 'unitPrice', e.target.value)}
+                            className="text-center"
+                          />
+                        </div>
+
+                        {/* Remove */}
+                        {orderItems.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveItem(idx)}
+                            className="btn-ghost p-1 text-[#ef4444] hover:text-red-300 flex-shrink-0"
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-1">Target Completion Date</label>
-                  <input
-                    type="date"
-                    value={newOrder.expectedAt}
-                    onChange={(e) => setNewOrder((prev) => ({ ...prev, expectedAt: e.target.value }))}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-300 focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-1">Order Memo Notes</label>
-                  <input
-                    type="text"
-                    value={newOrder.notes}
-                    onChange={(e) => setNewOrder((prev) => ({ ...prev, notes: e.target.value }))}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 placeholder-slate-600 focus:outline-none"
-                    placeholder="e.g. Standard terms, fragile cargo"
-                  />
-                </div>
-              </div>
-
-              {/* Order Items Table Builder */}
-              <div className="border-t border-slate-800 pt-4">
-                <div className="flex justify-between items-center mb-3">
-                  <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider">Order Items list</span>
-                  <button
-                    type="button"
-                    onClick={handleAddItem}
-                    className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold"
-                  >
-                    + Add item row
-                  </button>
-                </div>
-
-                <div className="space-y-3 max-h-48 overflow-y-auto">
-                  {orderItems.map((item, idx) => (
-                    <div key={idx} className="flex items-center space-x-3 bg-slate-950/40 p-2.5 rounded-lg border border-slate-850">
-                      <div className="flex-1">
-                        <select
-                          required
-                          value={item.productId}
-                          onChange={(e) => handleItemChange(idx, 'productId', e.target.value)}
-                          className="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1.5 text-xs text-slate-300 focus:outline-none"
-                        >
-                          <option value="">Select product...</option>
-                          {products.map((p) => (
-                            <option key={p.id} value={p.id}>
-                              {p.name} (${p.unitPrice})
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div className="w-20">
-                        <input
-                          type="number"
-                          required
-                          placeholder="Qty"
-                          value={item.quantity}
-                          onChange={(e) => handleItemChange(idx, 'quantity', e.target.value)}
-                          className="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1.5 text-xs text-slate-100 text-center focus:outline-none"
-                          min="1"
-                        />
-                      </div>
-
-                      <div className="w-24">
-                        <input
-                          type="number"
-                          step="0.01"
-                          required
-                          placeholder="Price"
-                          value={item.unitPrice}
-                          onChange={(e) => handleItemChange(idx, 'unitPrice', e.target.value)}
-                          className="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1.5 text-xs text-slate-100 text-center focus:outline-none"
-                        />
-                      </div>
-
-                      {orderItems.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveItem(idx)}
-                          className="text-red-400 hover:text-red-300"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="pt-4 flex justify-end space-x-3 border-t border-slate-800 bg-slate-900">
+              {/* Footer */}
+              <div className="modal-footer flex-shrink-0">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 rounded-lg text-sm font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
+                  className="btn-secondary"
                 >
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 rounded-lg text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white"
-                >
+                <button type="submit" className="btn-primary">
                   Place Order
                 </button>
               </div>
@@ -503,79 +614,79 @@ export const Orders: React.FC = () => {
         </div>
       )}
 
-      {/* Update Order Status Modal */}
+      {/* ── Status Update Modal ──────────────────── */}
       {showStatusModal && selectedOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-          <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 text-left">
-            <div className="flex justify-between items-center mb-6 pb-2 border-b border-slate-800">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider">Update Order Pipeline Status</h3>
-              <button onClick={() => setShowStatusModal(false)} className="text-slate-400 hover:text-white">
-                <X className="h-5 w-5" />
+        <div className="modal-overlay">
+          <div className="modal w-full max-w-sm">
+            {/* Header */}
+            <div className="modal-header">
+              <div>
+                <span className="modal-title">Update Status</span>
+                <p className="mono text-[#4a5f7a] mt-0.5">{selectedOrder.orderNumber}</p>
+              </div>
+              <button
+                onClick={() => setShowStatusModal(false)}
+                className="btn-ghost p-1 text-[#4a5f7a] hover:text-white"
+              >
+                <X className="h-4 w-4" />
               </button>
             </div>
 
-            <form onSubmit={handleUpdateStatus} className="space-y-4">
-              <div>
-                <p className="text-xs text-slate-400">Updating status for order:</p>
-                <h4 className="text-sm font-bold text-slate-200 mt-0.5">{selectedOrder.orderNumber}</h4>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-400 mb-1">Pipeline State *</label>
-                <select
-                  value={statusUpdate.status}
-                  onChange={(e) => setStatusUpdate((prev) => ({ ...prev, status: e.target.value }))}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-300 focus:outline-none"
-                >
-                  {/* Stepper values */}
-                  <option value="PENDING">PENDING</option>
-                  <option value="CONFIRMED">CONFIRMED</option>
-                  <option value="SHIPPED">SHIPPED</option>
-                  <option value="DELIVERED">DELIVERED (Fulfill & adjust stock)</option>
-                  <option value="CANCELLED">CANCELLED</option>
-                </select>
-              </div>
-
-              {/* Fulfill details if DELIVERED */}
-              {statusUpdate.status === 'DELIVERED' && (
-                <div className="bg-slate-950/40 p-4 rounded-xl border border-indigo-500/10 space-y-3">
-                  <div className="flex items-center space-x-2 text-indigo-400">
-                    <Truck className="h-4 w-4" />
-                    <span className="text-xs font-bold uppercase tracking-wider">Stock Receiving / Dispatch Point</span>
-                  </div>
-                  <p className="text-[11px] text-slate-400">
-                    Fulfilling this order will automatically adjust physical inventory levels. Choose the warehouse to balance.
-                  </p>
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-500 mb-1">Select Warehouse</label>
-                    <select
-                      value={statusUpdate.warehouseId}
-                      onChange={(e) => setStatusUpdate((prev) => ({ ...prev, warehouseId: e.target.value }))}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-300 focus:outline-none"
-                    >
-                      {warehouses.map((w) => (
-                        <option key={w.id} value={w.id}>
-                          {w.name} ({w.location})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+            {/* Body */}
+            <form onSubmit={handleUpdateStatus}>
+              <div className="modal-body space-y-4">
+                <div>
+                  <label className="section-label block mb-1.5">Pipeline Status *</label>
+                  <select
+                    value={statusUpdate.status}
+                    onChange={(e) => setStatusUpdate((prev) => ({ ...prev, status: e.target.value }))}
+                  >
+                    <option value="PENDING">PENDING</option>
+                    <option value="CONFIRMED">CONFIRMED</option>
+                    <option value="SHIPPED">SHIPPED</option>
+                    <option value="DELIVERED">DELIVERED — Fulfill &amp; adjust stock</option>
+                    <option value="CANCELLED">CANCELLED</option>
+                  </select>
                 </div>
-              )}
 
-              <div className="pt-4 flex justify-end space-x-3 border-t border-slate-800">
+                {/* Warehouse picker shown only on DELIVERED */}
+                {statusUpdate.status === 'DELIVERED' && (
+                  <div className="bg-[#070d19] border border-[#1e2d45] rounded-md p-3 space-y-2">
+                    <div className="flex items-center gap-2 text-[#3b82f6]">
+                      <Truck className="h-3.5 w-3.5" />
+                      <span className="section-label text-[#3b82f6]">Stock Receiving Point</span>
+                    </div>
+                    <p className="text-[11px] text-[#4a5f7a]">
+                      Fulfilling will automatically adjust physical inventory levels.
+                    </p>
+                    <div>
+                      <label className="section-label block mb-1.5">Warehouse</label>
+                      <select
+                        value={statusUpdate.warehouseId}
+                        onChange={(e) => setStatusUpdate((prev) => ({ ...prev, warehouseId: e.target.value }))}
+                      >
+                        {warehouses.map((w) => (
+                          <option key={w.id} value={w.id}>
+                            {w.name} ({w.location})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Footer */}
+              <div className="modal-footer">
                 <button
                   type="button"
                   onClick={() => setShowStatusModal(false)}
-                  className="px-4 py-2 rounded-lg text-sm font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
+                  className="btn-secondary"
                 >
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 rounded-lg text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white"
-                >
-                  Save Status
+                <button type="submit" className="btn-primary">
+                  Save
                 </button>
               </div>
             </form>

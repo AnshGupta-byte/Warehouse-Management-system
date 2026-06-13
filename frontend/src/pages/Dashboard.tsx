@@ -3,34 +3,26 @@ import { api } from '../services/api';
 import { useSocket } from '../context/SocketContext';
 import { Link } from 'react-router-dom';
 import {
-  BarChart as RechartsBarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
+  BarChart as RechartsBarChart, Bar, XAxis, YAxis,
+  CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
 import {
-  TrendingUp,
-  AlertTriangle,
-  Boxes,
-  ClipboardCheck,
-  ArrowUpRight,
-  ArrowDownRight,
-  FileSpreadsheet,
+  TrendingUp, AlertTriangle, Boxes, ClipboardCheck,
+  ArrowUpRight, ArrowDownRight, Circle, ExternalLink,
 } from 'lucide-react';
+
+const STATUS_BADGE: Record<string, string> = {
+  DELIVERED: 'badge badge-green',
+  PENDING:   'badge badge-amber',
+  CONFIRMED: 'badge badge-blue',
+  SHIPPED:   'badge badge-blue',
+  CANCELLED: 'badge badge-gray',
+};
 
 export const Dashboard: React.FC = () => {
   const { subscribe } = useSocket();
 
-  const [stats, setStats] = useState({
-    totalSKUs: 0,
-    totalStockUnits: 0,
-    valuation: 0,
-    activeAlerts: 0,
-  });
-
+  const [stats, setStats] = useState({ totalSKUs: 0, totalStockUnits: 0, valuation: 0, activeAlerts: 0 });
   const [chartData, setChartData] = useState<any[]>([]);
   const [lowStockItems, setLowStockItems] = useState<any[]>([]);
   const [recentMovements, setRecentMovements] = useState<any[]>([]);
@@ -40,61 +32,33 @@ export const Dashboard: React.FC = () => {
   const loadDashboardData = async () => {
     try {
       const [prodRes, orderRes, alertRes] = await Promise.all([
-        api.products.list(),
-        api.orders.list(),
-        api.alerts.list({ isResolved: false }),
+        api.products.list(), api.orders.list(), api.alerts.list({ isResolved: false }),
       ]);
-
       if (prodRes.success && orderRes.success && alertRes.success) {
         const products = prodRes.products;
         const orders = orderRes.orders;
         const alerts = alertRes.alerts;
-
-        // Calculate statistics
-        const skusCount = products.length;
-        let stockUnits = 0;
-        let totalValuation = 0;
+        let stockUnits = 0, totalValuation = 0;
         const lowStockList: any[] = [];
         const formattedChartData = products.map((p: any) => {
           const qty = p.stockLevels.reduce((sum: number, sl: any) => sum + sl.quantity, 0);
-          stockUnits += qty;
-          totalValuation += qty * p.unitPrice;
-
-          if (qty <= p.reorderPoint) {
-            lowStockList.push({ ...p, quantity: qty });
-          }
-
-          return {
-            name: p.name.length > 15 ? p.name.substring(0, 15) + '...' : p.name,
-            Stock: qty,
-            ReorderPoint: p.reorderPoint,
-          };
+          stockUnits += qty; totalValuation += qty * p.unitPrice;
+          if (qty <= p.reorderPoint) lowStockList.push({ ...p, quantity: qty });
+          return { name: p.name.length > 14 ? p.name.substring(0, 14) + '…' : p.name, Stock: qty, ReorderPoint: p.reorderPoint };
         });
-
-        setStats({
-          totalSKUs: skusCount,
-          totalStockUnits: stockUnits,
-          valuation: parseFloat(totalValuation.toFixed(2)),
-          activeAlerts: alerts.length,
-        });
-
+        setStats({ totalSKUs: products.length, totalStockUnits: stockUnits, valuation: parseFloat(totalValuation.toFixed(2)), activeAlerts: alerts.length });
         setChartData(formattedChartData);
         setLowStockItems(lowStockList);
-        setRecentOrders(orders.slice(0, 5));
+        setRecentOrders(orders.slice(0, 6));
       }
-    } catch (err) {
-      console.error('[Dashboard] Error loading metrics:', err);
-    }
+    } catch (err) { console.error('[Dashboard]', err); }
   };
 
   const loadMovementHistory = async () => {
-    // We fetch movements by querying the database, but since we didn't add a explicit endpoint,
-    // we can simulate or fetch from orders/products. Let's mock a few based on seed values
-    // and let it append websocket events in real-time.
     const mockHist = [
-      { id: '1', sku: 'FOOD-3001', name: 'Colombian Coffee Beans', type: 'IN', quantity: 100, reason: 'Order fulfillment PO-20001', date: new Date(Date.now() - 3600000 * 2) },
-      { id: '2', sku: 'ELEC-1001', name: 'UltraHD Smart TV', type: 'OUT', quantity: 6, reason: 'Order fulfillment SO-10004', date: new Date(Date.now() - 3600000 * 5) },
-      { id: '3', sku: 'APPR-2001', name: 'Waterproof Mountain Parka', type: 'OUT', quantity: 20, reason: 'Order fulfillment SO-10002', date: new Date(Date.now() - 3600000 * 12) },
+      { id: '1', sku: 'FOOD-3001', name: 'Colombian Coffee Beans', type: 'IN', quantity: 100, reason: 'PO-20001', date: new Date(Date.now() - 3600000 * 2) },
+      { id: '2', sku: 'ELEC-1001', name: 'UltraHD Smart TV', type: 'OUT', quantity: 6, reason: 'SO-10004', date: new Date(Date.now() - 3600000 * 5) },
+      { id: '3', sku: 'APPR-2001', name: 'Waterproof Mountain Parka', type: 'OUT', quantity: 20, reason: 'SO-10002', date: new Date(Date.now() - 3600000 * 12) },
     ];
     setRecentMovements(mockHist);
   };
@@ -102,201 +66,196 @@ export const Dashboard: React.FC = () => {
   useEffect(() => {
     setLoading(true);
     Promise.all([loadDashboardData(), loadMovementHistory()]).finally(() => setLoading(false));
-
-    // Live WebSocket bindings to reload dashboards dynamically on adjustments or orders
-    const unsubscribeStock = subscribe('STOCK_UPDATED', (payload) => {
+    const u1 = subscribe('STOCK_UPDATED', (payload) => {
       loadDashboardData();
-      const movement = {
-        id: Math.random().toString(),
-        sku: payload.data.product.sku,
-        name: payload.data.product.name,
-        type: payload.data.stockLevel.quantity > payload.data.stockLevel.quantity ? 'IN' : 'ADJUST',
-        quantity: Math.abs(payload.data.stockLevel.quantity),
-        reason: 'Manual adjustment',
-        date: new Date(),
-      };
-      setRecentMovements((prev) => [movement, ...prev.slice(0, 4)]);
+      setRecentMovements((prev) => [{
+        id: Math.random().toString(), sku: payload.data.product.sku,
+        name: payload.data.product.name, type: 'ADJUST',
+        quantity: Math.abs(payload.data.stockLevel.quantity), reason: 'Manual', date: new Date(),
+      }, ...prev.slice(0, 4)]);
     });
-
-    const unsubscribeOrder = subscribe('ORDER_UPDATED', () => {
-      loadDashboardData();
-    });
-
-    const unsubscribeAlert = subscribe('ALERT_CREATED', () => {
-      loadDashboardData();
-    });
-
-    return () => {
-      unsubscribeStock();
-      unsubscribeOrder();
-      unsubscribeAlert();
-    };
+    const u2 = subscribe('ORDER_UPDATED', () => loadDashboardData());
+    const u3 = subscribe('ALERT_CREATED', () => loadDashboardData());
+    return () => { u1(); u2(); u3(); };
   }, [subscribe]);
 
   if (loading) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent"></div>
+      <div className="flex h-64 items-center justify-center gap-3">
+        <div className="spinner" /><span className="text-[12px]" style={{ color: '#4a5f7a' }}>Loading...</span>
       </div>
     );
   }
 
   const kpis = [
-    { title: 'Total SKUs Managed', value: stats.totalSKUs, icon: Boxes, color: 'text-indigo-400', bg: 'bg-indigo-950/20 border-indigo-900/50' },
-    { title: 'Aggregate Stock Volume', value: stats.totalStockUnits.toLocaleString(), icon: TrendingUp, color: 'text-emerald-400', bg: 'bg-emerald-950/20 border-emerald-900/50' },
-    { title: 'Inventory Valuation', value: `$${stats.valuation.toLocaleString()}`, icon: ClipboardCheck, color: 'text-blue-400', bg: 'bg-blue-950/20 border-blue-900/50' },
-    { title: 'Critical Stock Alerts', value: stats.activeAlerts, icon: AlertTriangle, color: stats.activeAlerts > 0 ? 'text-red-400 animate-pulse' : 'text-slate-400', bg: stats.activeAlerts > 0 ? 'bg-red-950/30 border-red-900/60' : 'bg-slate-900/50 border-slate-800' },
+    { label: 'TOTAL SKUs', value: stats.totalSKUs, sub: 'Managed products', accentColor: '#3b82f6' },
+    { label: 'STOCK UNITS', value: stats.totalStockUnits.toLocaleString(), sub: 'Across all locations', accentColor: '#10b981' },
+    { label: 'INVENTORY VALUE', value: `$${stats.valuation.toLocaleString()}`, sub: 'Total asset value', accentColor: '#7c3aed' },
+    { label: 'ACTIVE ALERTS', value: stats.activeAlerts, sub: stats.activeAlerts > 0 ? 'Requires attention' : 'All systems nominal', accentColor: stats.activeAlerts > 0 ? '#ef4444' : '#1e2d45' },
   ];
 
   return (
-    <div className="space-y-8">
-      {/* Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {kpis.map((kpi) => {
-          const Icon = kpi.icon;
-          return (
-            <div key={kpi.title} className={`p-6 rounded-xl border ${kpi.bg} shadow-md`}>
-              <div className="flex justify-between items-center">
-                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{kpi.title}</span>
-                <Icon className={`h-5 w-5 ${kpi.color}`} />
-              </div>
-              <p className="text-3xl font-extrabold text-white mt-4">{kpi.value}</p>
-            </div>
-          );
-        })}
+    <div className="space-y-5 fade-in">
+      {/* ── Header ──────────────────────────────────── */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-[14px] font-semibold text-white">Operations Overview</h1>
+          <p className="text-[11px] mt-0.5" style={{ color: '#4a5f7a' }}>
+            {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+          </p>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <Circle className="h-2 w-2 fill-emerald-400 text-emerald-400" style={{ animation: 'pulse 2s infinite' }} />
+          <span className="badge badge-green text-[9px]">LIVE</span>
+        </div>
       </div>
 
-      {/* Charts & Graphs */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Stock Levels Chart */}
-        <div className="lg:col-span-2 p-6 rounded-xl bg-slate-900 border border-slate-800 shadow-md">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider">Product Inventory Distribution</h3>
-            <span className="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-400 border border-slate-700">Units in Stock vs Reorder Level</span>
+      {/* ── KPIs ────────────────────────────────────── */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {kpis.map((k) => (
+          <div key={k.label} className="kpi-card" style={{ '--kpi-accent': k.accentColor } as any}>
+            <style>{`.kpi-card:nth-child(${kpis.indexOf(k) + 1})::before { background: linear-gradient(90deg, ${k.accentColor}, transparent); }`}</style>
+            <div className="kpi-label">{k.label}</div>
+            <div className="kpi-value">{k.value}</div>
+            <div className="kpi-trend" style={{ color: '#4a5f7a' }}>{k.sub}</div>
           </div>
-          <div className="h-80 w-full">
+        ))}
+      </div>
+
+      {/* ── Main grid ───────────────────────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        {/* Stock chart */}
+        <div className="lg:col-span-2 panel">
+          <div className="panel-header">
+            <span className="panel-title">Inventory vs Reorder Levels</span>
+            <div className="flex items-center gap-4 text-[10px]" style={{ color: '#4a5f7a' }}>
+              <span className="flex items-center gap-1.5"><span className="inline-block h-2 w-2 rounded-sm" style={{ background: '#3b82f6' }} />Stock</span>
+              <span className="flex items-center gap-1.5"><span className="inline-block h-2 w-2 rounded-sm" style={{ background: '#f59e0b' }} />Reorder</span>
+            </div>
+          </div>
+          <div className="p-4 h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <RechartsBarChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                <XAxis dataKey="name" stroke="#64748b" fontSize={10} tickLine={false} />
-                <YAxis stroke="#64748b" fontSize={10} tickLine={false} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '8px' }}
-                  labelStyle={{ color: '#fff', fontWeight: 'bold' }}
-                />
-                <Bar dataKey="Stock" fill="#4f46e5" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="ReorderPoint" fill="#f59e0b" radius={[4, 4, 0, 0]} opacity={0.6} />
+              <RechartsBarChart data={chartData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }} barSize={14} barGap={2}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1e2d45" vertical={false} />
+                <XAxis dataKey="name" stroke="#2d4060" fontSize={9} tickLine={false} axisLine={false} />
+                <YAxis stroke="#2d4060" fontSize={9} tickLine={false} axisLine={false} />
+                <Tooltip contentStyle={{ background: '#0b1120', border: '1px solid #1e2d45', borderRadius: 4, fontSize: 11 }} labelStyle={{ color: '#cbd5e1', fontWeight: 600 }} cursor={{ fill: '#1e2d4510' }} />
+                <Bar dataKey="Stock" fill="#3b82f6" radius={[2, 2, 0, 0]} />
+                <Bar dataKey="ReorderPoint" fill="#f59e0b" radius={[2, 2, 0, 0]} opacity={0.7} />
               </RechartsBarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Low Stock Watchlist */}
-        <div className="p-6 rounded-xl bg-slate-900 border border-slate-800 shadow-md">
-          <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-6">Low Stock Watchlist</h3>
-          <div className="space-y-4 max-h-80 overflow-y-auto">
-            {lowStockItems.length === 0 ? (
-              <p className="text-xs text-slate-500 text-center py-12">All managed items are optimally stocked.</p>
-            ) : (
-              lowStockItems.map((item) => (
-                <div key={item.id} className="flex justify-between items-center p-3 rounded-lg bg-slate-950 border border-slate-800 hover:border-slate-700 transition-all">
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-200">{item.name}</h4>
-                    <p className="text-[10px] text-slate-400 mt-1">SKU: {item.sku} • Min limit: {item.reorderPoint}</p>
-                  </div>
-                  <div className="text-right">
-                    <span className="inline-block px-2 py-0.5 rounded text-[10px] font-extrabold bg-red-950/40 text-red-400 border border-red-900/50">
-                      {item.quantity} Left
-                    </span>
-                  </div>
-                </div>
-              ))
-            )}
+        {/* Low stock watchlist */}
+        <div className="panel">
+          <div className="panel-header">
+            <span className="panel-title">Low Stock Watchlist</span>
+            <span className="badge badge-amber">{lowStockItems.length} items</span>
           </div>
+          {lowStockItems.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="text-[12px] font-medium mb-1" style={{ color: '#4a5f7a' }}>All stock levels healthy</div>
+              <div className="text-[11px]" style={{ color: '#2d4060' }}>No items below reorder point</div>
+            </div>
+          ) : (
+            <div className="divide-y" style={{ borderColor: '#111e35' }}>
+              {lowStockItems.map((item) => (
+                <div key={item.id} className="flex items-center justify-between px-4 py-2.5 transition-all" style={{ cursor: 'default' }} onMouseEnter={e => (e.currentTarget.style.background = '#0f1729')} onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[12px] font-medium truncate" style={{ color: '#cbd5e1' }}>{item.name}</div>
+                    <div className="mono text-[10px] mt-0.5" style={{ color: '#4a5f7a' }}>{item.sku} · min {item.reorderPoint}</div>
+                  </div>
+                  <span className="badge badge-red ml-3 flex-shrink-0">{item.quantity} left</span>
+                </div>
+              ))}
+            </div>
+          )}
           {lowStockItems.length > 0 && (
-            <div className="mt-6 text-center">
-              <Link
-                to="/forecasting"
-                className="inline-flex items-center space-x-1 text-xs text-indigo-400 hover:text-indigo-300 font-semibold"
-              >
-                <span>Generate Auto-PO Recommendations</span>
-                <ArrowUpRight className="h-3.5 w-3.5" />
+            <div className="px-4 py-2.5" style={{ borderTop: '1px solid #1e2d45' }}>
+              <Link to="/forecasting" className="flex items-center gap-1.5 text-[11px] font-medium" style={{ color: '#60a5fa' }}>
+                <TrendingUp className="h-3.5 w-3.5" /> Generate reorder recommendations
               </Link>
             </div>
           )}
         </div>
       </div>
 
-      {/* Recent Activity: Orders & Stock Movements */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Recent Orders */}
-        <div className="p-6 rounded-xl bg-slate-900 border border-slate-800 shadow-md">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider">Recent Orders Pipeline</h3>
-            <Link to="/orders" className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold">View All</Link>
+      {/* ── Bottom grid ─────────────────────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {/* Recent orders */}
+        <div className="panel">
+          <div className="panel-header">
+            <span className="panel-title">Recent Orders</span>
+            <Link to="/orders" className="flex items-center gap-1 text-[11px]" style={{ color: '#60a5fa' }}>
+              View all <ExternalLink className="h-3 w-3" />
+            </Link>
           </div>
-          <div className="space-y-3">
-            {recentOrders.length === 0 ? (
-              <p className="text-xs text-slate-500 text-center py-8">No recent purchase or sales orders.</p>
-            ) : (
-              recentOrders.map((order: any) => (
-                <div key={order.id} className="flex justify-between items-center p-3 rounded-lg bg-slate-950 border border-slate-800">
-                  <div>
-                    <span className="text-xs font-bold text-slate-200">{order.orderNumber}</span>
-                    <p className="text-[10px] text-slate-400 mt-1">
-                      {order.type === 'PURCHASE' ? `PO Inbound • Supplier: ${order.supplier}` : `SO Outbound • Customer: ${order.customer}`}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs font-bold text-slate-300">${order.totalAmount.toLocaleString()}</p>
-                    <span className={`inline-block text-[9px] font-bold px-1.5 py-0.5 rounded mt-1 ${
-                      order.status === 'DELIVERED'
-                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                        : order.status === 'PENDING'
-                        ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                        : 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20'
-                    }`}>
-                      {order.status}
-                    </span>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
+          {recentOrders.length === 0 ? (
+            <div className="py-8 text-center text-[12px]" style={{ color: '#4a5f7a' }}>No recent orders</div>
+          ) : (
+            <table>
+              <thead>
+                <tr>
+                  <th>Order #</th>
+                  <th>Type</th>
+                  <th>Partner</th>
+                  <th className="text-right">Amount</th>
+                  <th className="text-right">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentOrders.map((order: any) => (
+                  <tr key={order.id}>
+                    <td><span className="mono" style={{ color: '#60a5fa' }}>{order.orderNumber}</span></td>
+                    <td><span className={order.type === 'PURCHASE' ? 'badge badge-blue' : 'badge badge-purple'}>{order.type === 'PURCHASE' ? 'PO' : 'SO'}</span></td>
+                    <td style={{ color: '#cbd5e1', maxWidth: 120 }}><span className="truncate block">{order.type === 'PURCHASE' ? order.supplier : order.customer}</span></td>
+                    <td className="text-right font-mono font-semibold text-white text-[11px]">${order.totalAmount.toLocaleString()}</td>
+                    <td className="text-right"><span className={STATUS_BADGE[order.status] || 'badge badge-gray'}>{order.status}</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
 
-        {/* Live Stock Movements Logs */}
-        <div className="p-6 rounded-xl bg-slate-900 border border-slate-800 shadow-md">
-          <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-6">Live Stock Movements</h3>
-          <div className="space-y-3">
-            {recentMovements.length === 0 ? (
-              <p className="text-xs text-slate-500 text-center py-8">No recent inventory adjustments.</p>
-            ) : (
-              recentMovements.map((move: any) => (
-                <div key={move.id} className="flex justify-between items-center p-3 rounded-lg bg-slate-950 border border-slate-800">
-                  <div className="flex items-center space-x-3">
-                    <div className={`p-2 rounded-lg ${move.type === 'IN' ? 'bg-emerald-950/30' : 'bg-red-950/30'}`}>
-                      {move.type === 'IN' ? (
-                        <ArrowUpRight className="h-4 w-4 text-emerald-400" />
-                      ) : (
-                        <ArrowDownRight className="h-4 w-4 text-red-400" />
-                      )}
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-bold text-slate-200">{move.name}</h4>
-                      <p className="text-[10px] text-slate-400 mt-0.5">SKU: {move.sku} • {move.reason}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <span className={`text-xs font-bold ${move.type === 'IN' ? 'text-emerald-400' : 'text-red-400'}`}>
-                      {move.type === 'IN' ? '+' : '-'}{move.quantity}
-                    </span>
-                    <p className="text-[9px] text-slate-500 mt-1">{new Date(move.date).toLocaleTimeString()}</p>
-                  </div>
-                </div>
-              ))
-            )}
+        {/* Live movements */}
+        <div className="panel">
+          <div className="panel-header">
+            <span className="panel-title">Stock Movements</span>
+            <div className="flex items-center gap-1.5"><Circle className="h-2 w-2 fill-emerald-400 text-emerald-400" /><span className="text-[10px]" style={{ color: '#4a5f7a' }}>Live</span></div>
           </div>
+          {recentMovements.length === 0 ? (
+            <div className="py-8 text-center text-[12px]" style={{ color: '#4a5f7a' }}>No recent movements</div>
+          ) : (
+            <table>
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Product</th>
+                  <th>SKU</th>
+                  <th>Ref</th>
+                  <th className="text-right">Qty</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentMovements.map((move: any) => (
+                  <tr key={move.id}>
+                    <td style={{ color: '#2d4060', whiteSpace: 'nowrap' }}>{new Date(move.date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</td>
+                    <td style={{ color: '#cbd5e1', maxWidth: 120 }}><span className="truncate block">{move.name}</span></td>
+                    <td><span className="mono">{move.sku}</span></td>
+                    <td style={{ color: '#4a5f7a' }}>{move.reason}</td>
+                    <td className="text-right">
+                      <span className="flex items-center justify-end gap-1 font-mono font-semibold text-[11px]" style={{ color: move.type === 'IN' ? '#10b981' : '#ef4444' }}>
+                        {move.type === 'IN' ? <ArrowUpRight className="h-3.5 w-3.5" /> : <ArrowDownRight className="h-3.5 w-3.5" />}
+                        {move.type === 'IN' ? '+' : '-'}{move.quantity}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>
