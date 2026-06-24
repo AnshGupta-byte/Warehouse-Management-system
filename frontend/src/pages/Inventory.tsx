@@ -542,7 +542,7 @@ export const Inventory: React.FC = () => {
                       {/* Unit Price */}
                       <td className="px-4 py-3 whitespace-nowrap">
                         <span className="font-['JetBrains_Mono'] text-[13px] text-[var(--text-primary)] tabular-nums">
-                          ${p.unitPrice.toFixed(2)}
+                          ₹{p.unitPrice.toFixed(2)}
                         </span>
                       </td>
 
