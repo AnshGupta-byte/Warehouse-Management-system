@@ -13,6 +13,7 @@ import {
   Sparkles,
   ChevronDown,
   ChevronRight,
+  Package,
 } from 'lucide-react';
 
 export const Orders: React.FC = () => {
@@ -175,25 +176,6 @@ export const Orders: React.FC = () => {
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'PENDING':
-        return 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
-      case 'CONFIRMED':
-        return 'bg-blue-500/10 text-blue-400 border border-blue-500/20';
-      case 'SHIPPED':
-        return 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20';
-      case 'DELIVERED':
-        return 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
-      case 'CANCELLED':
-        return 'bg-red-500/10 text-red-400 border border-red-500/20';
-      default:
-        return 'bg-slate-800 text-slate-400';
-    }
-  };
-
-  const steps = ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED'];
-
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
       case 'PENDING':   return 'badge badge-amber';
@@ -204,6 +186,8 @@ export const Orders: React.FC = () => {
       default:          return 'badge badge-gray';
     }
   };
+
+  const steps = ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED'];
 
   const toggleRow = (id: string) => {
     setExpandedRows((prev) => {
@@ -234,11 +218,11 @@ export const Orders: React.FC = () => {
                     ? current
                       ? 'bg-[#3b82f6] ring-2 ring-[#3b82f6]/30'
                       : 'bg-[#3b82f6]'
-                    : 'bg-[#1e2d45]'
+                    : 'bg-[#27272a]'
                 }`}
               />
               {i < steps.length - 1 && (
-                <div className={`h-px flex-1 ${i < currentIdx ? 'bg-[#3b82f6]' : 'bg-[#1e2d45]'}`} />
+                <div className={`h-px flex-1 ${i < currentIdx ? 'bg-[#3b82f6]' : 'bg-[#27272a]'}`} />
               )}
             </React.Fragment>
           );
@@ -255,7 +239,7 @@ export const Orders: React.FC = () => {
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="bg-[#0b1120] border-[#1e2d45] text-[12px] text-[#cbd5e1] rounded-md px-3 py-1.5 h-8 border focus:border-[#3b82f6] outline-none"
+            className="h-9 text-[12px] rounded-lg px-3"
             style={{ width: 160 }}
           >
             <option value="">All Order Types</option>
@@ -266,7 +250,7 @@ export const Orders: React.FC = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="bg-[#0b1120] border-[#1e2d45] text-[12px] text-[#cbd5e1] rounded-md px-3 py-1.5 h-8 border focus:border-[#3b82f6] outline-none"
+            className="h-9 text-[12px] rounded-lg px-3"
             style={{ width: 140 }}
           >
             <option value="">All Statuses</option>
@@ -298,13 +282,21 @@ export const Orders: React.FC = () => {
         </div>
 
         {loading ? (
-          <div className="py-16 text-center text-[#4a5f7a] text-[12px]">
-            <div className="spinner mx-auto mb-3" />
-            Loading orders…
+          <div className="p-5 space-y-3">
+            <div className="skeleton h-4 w-1/3" />
+            <div className="skeleton h-10 w-full" />
+            <div className="skeleton h-10 w-full" />
+            <div className="skeleton h-10 w-full" />
+            <div className="skeleton h-10 w-full" />
+            <div className="skeleton h-10 w-3/4" />
           </div>
         ) : orders.length === 0 ? (
-          <div className="py-16 text-center text-[#4a5f7a] text-[12px]">
-            No orders found for the selected filters.
+          <div className="py-20 flex flex-col items-center justify-center text-center">
+            <div className="h-12 w-12 rounded-xl bg-[rgba(37,99,235,0.08)] flex items-center justify-center mb-3">
+              <Package className="h-6 w-6 text-[var(--accent)]" />
+            </div>
+            <p className="text-[14px] font-semibold text-[var(--text-primary)]">No orders found</p>
+            <p className="text-[12px] text-[var(--text-muted)] mt-1">Try adjusting your filters or create a new order.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -334,14 +326,14 @@ export const Orders: React.FC = () => {
                         {/* Expand chevron */}
                         <td className="text-center px-2">
                           {isExpanded
-                            ? <ChevronDown className="h-3.5 w-3.5 text-[#4a5f7a] mx-auto" />
-                            : <ChevronRight className="h-3.5 w-3.5 text-[#4a5f7a] mx-auto" />
+                            ? <ChevronDown className="h-3.5 w-3.5 text-[var(--text-muted)] mx-auto" />
+                            : <ChevronRight className="h-3.5 w-3.5 text-[var(--text-muted)] mx-auto" />
                           }
                         </td>
 
                         {/* ORDER # */}
                         <td>
-                          <span className="mono text-[#60a5fa] font-medium">
+                          <span className="mono text-[var(--accent)] font-medium">
                             {order.orderNumber}
                           </span>
                         </td>
@@ -355,12 +347,12 @@ export const Orders: React.FC = () => {
                         </td>
 
                         {/* PARTNER */}
-                        <td className="text-[12px] text-[#cbd5e1]">
+                        <td className="text-[13px] text-[var(--text-primary)]">
                           {order.type === 'PURCHASE' ? order.supplier : order.customer}
                         </td>
 
                         {/* DATE */}
-                        <td className="text-[11px] text-[#4a5f7a]">
+                        <td className="text-[12px] text-[var(--text-muted)]">
                           {order.expectedAt
                             ? new Date(order.expectedAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
                             : '—'}
@@ -368,7 +360,7 @@ export const Orders: React.FC = () => {
 
                         {/* TOTAL */}
                         <td>
-                          <span className="font-mono font-semibold text-white tabular-nums">
+                          <span className="font-['JetBrains_Mono'] font-semibold text-[var(--text-primary)] tabular-nums">
                             ${order.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </span>
                         </td>
@@ -389,7 +381,7 @@ export const Orders: React.FC = () => {
                         <td onClick={(e) => e.stopPropagation()}>
                           {order.status !== 'DELIVERED' && order.status !== 'CANCELLED' ? (
                             <button
-                              className="btn-ghost text-[11px] text-[#60a5fa] hover:text-white"
+                              className="btn-ghost text-[12px] text-[var(--accent)] hover:text-[var(--text-primary)]"
                               onClick={() => {
                                 setSelectedOrder(order);
                                 setStatusUpdate({ status: order.status, warehouseId: warehouses[0]?.id || '' });
@@ -399,7 +391,7 @@ export const Orders: React.FC = () => {
                               Update
                             </button>
                           ) : (
-                            <span className="text-[11px] text-[#4a5f7a]">—</span>
+                            <span className="text-[12px] text-[var(--text-muted)]">—</span>
                           )}
                         </td>
                       </tr>
@@ -407,8 +399,8 @@ export const Orders: React.FC = () => {
                       {/* Expanded sub-row: order items */}
                       {isExpanded && (
                         <tr>
-                          <td colSpan={9} className="p-0 bg-[#070d19]">
-                            <div className="px-8 py-3 border-t border-[#1e2d45]">
+                          <td colSpan={9} className="p-0 bg-[var(--bg-root)]">
+                            <div className="px-8 py-3 border-t border-[var(--border)]">
                               <p className="section-label mb-2">Line Items</p>
                               <table className="w-full">
                                 <thead>
@@ -423,18 +415,18 @@ export const Orders: React.FC = () => {
                                 <tbody>
                                   {order.items.map((item: any) => (
                                     <tr key={item.id}>
-                                      <td className="text-[#cbd5e1]">{item.product.name}</td>
-                                      <td><span className="mono text-[#4a5f7a]">{item.product.sku}</span></td>
+                                      <td className="text-[var(--text-primary)]">{item.product.name}</td>
+                                      <td><span className="mono text-[var(--text-muted)]">{item.product.sku}</span></td>
                                       <td className="text-right tabular-nums">{item.quantity}</td>
-                                      <td className="text-right tabular-nums font-mono">${item.unitPrice.toFixed(2)}</td>
-                                      <td className="text-right tabular-nums font-mono font-semibold text-white">${item.total.toFixed(2)}</td>
+                                      <td className="text-right tabular-nums font-['JetBrains_Mono']">${item.unitPrice.toFixed(2)}</td>
+                                      <td className="text-right tabular-nums font-['JetBrains_Mono'] font-semibold text-[var(--text-primary)]">${item.total.toFixed(2)}</td>
                                     </tr>
                                   ))}
                                 </tbody>
                               </table>
                               {order.notes && (
-                                <p className="text-[11px] text-[#4a5f7a] mt-2 pt-2 border-t border-[#1e2d45]">
-                                  <span className="text-[#94a3b8] font-semibold">Remarks: </span>
+                                <p className="text-[12px] text-[var(--text-muted)] mt-2 pt-2 border-t border-[var(--border)]">
+                                  <span className="text-[var(--text-secondary)] font-semibold">Remarks: </span>
                                   {order.notes}
                                 </p>
                               )}
@@ -460,7 +452,7 @@ export const Orders: React.FC = () => {
               <span className="modal-title">Create Order</span>
               <button
                 onClick={() => setShowAddModal(false)}
-                className="btn-ghost p-1 text-[#4a5f7a] hover:text-white"
+                className="btn-ghost p-1 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -524,7 +516,7 @@ export const Orders: React.FC = () => {
                     <button
                       type="button"
                       onClick={handleAddItem}
-                      className="btn-ghost text-[#3b82f6] hover:text-white text-[11px]"
+                      className="btn-ghost text-[var(--accent)] hover:text-[var(--text-primary)] text-[12px]"
                     >
                       <Plus className="h-3 w-3" />
                       Add Line Item
@@ -535,7 +527,7 @@ export const Orders: React.FC = () => {
                     {orderItems.map((item, idx) => (
                       <div
                         key={idx}
-                        className="flex items-center gap-2 bg-[#070d19] border border-[#1e2d45] rounded-md px-2 py-1.5"
+                        className="flex items-center gap-2 bg-[var(--bg-root)] border border-[var(--border)] rounded-lg px-2 py-1.5"
                       >
                         {/* Product select */}
                         <div className="flex-1">
@@ -585,7 +577,7 @@ export const Orders: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => handleRemoveItem(idx)}
-                            className="btn-ghost p-1 text-[#ef4444] hover:text-red-300 flex-shrink-0"
+                            className="btn-ghost p-1 text-[var(--danger)] hover:text-red-300 flex-shrink-0"
                           >
                             <X className="h-3.5 w-3.5" />
                           </button>
@@ -622,11 +614,11 @@ export const Orders: React.FC = () => {
             <div className="modal-header">
               <div>
                 <span className="modal-title">Update Status</span>
-                <p className="mono text-[#4a5f7a] mt-0.5">{selectedOrder.orderNumber}</p>
+                <p className="mono text-[var(--text-muted)] mt-0.5">{selectedOrder.orderNumber}</p>
               </div>
               <button
                 onClick={() => setShowStatusModal(false)}
-                className="btn-ghost p-1 text-[#4a5f7a] hover:text-white"
+                className="btn-ghost p-1 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -651,12 +643,12 @@ export const Orders: React.FC = () => {
 
                 {/* Warehouse picker shown only on DELIVERED */}
                 {statusUpdate.status === 'DELIVERED' && (
-                  <div className="bg-[#070d19] border border-[#1e2d45] rounded-md p-3 space-y-2">
-                    <div className="flex items-center gap-2 text-[#3b82f6]">
+                  <div className="bg-[var(--bg-root)] border border-[var(--border)] rounded-xl p-3 space-y-2">
+                    <div className="flex items-center gap-2 text-[var(--accent)]">
                       <Truck className="h-3.5 w-3.5" />
-                      <span className="section-label text-[#3b82f6]">Stock Receiving Point</span>
+                      <span className="section-label text-[var(--accent)]">Stock Receiving Point</span>
                     </div>
-                    <p className="text-[11px] text-[#4a5f7a]">
+                    <p className="text-[12px] text-[var(--text-muted)]">
                       Fulfilling will automatically adjust physical inventory levels.
                     </p>
                     <div>

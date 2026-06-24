@@ -318,12 +318,12 @@ export const Inventory: React.FC = () => {
       })
     : products;
 
-  // Input class helper
+  // Input class helpers — zinc design system
   const inputCls =
-    'w-full bg-[#070d19] border border-[#1e2d45] rounded-md px-3 py-2 text-sm text-[#cbd5e1] placeholder-[#4a5f7a] focus:outline-none focus:border-[#243552] focus:ring-0 transition-colors';
+    "w-full h-10 bg-[var(--bg-root)] border border-[var(--border)] rounded-lg px-3 py-2 text-[13px] text-[var(--text-primary)] placeholder-[#52525b] focus:outline-none focus:ring-2 focus:ring-[#2563eb]/40 focus:border-[var(--accent-light)] transition-colors";
   const selectCls =
-    'bg-[#070d19] border border-[#1e2d45] rounded-md px-3 py-2 text-sm text-[#94a3b8] focus:outline-none focus:border-[#243552] transition-colors';
-  const labelCls = 'block text-[10px] font-semibold tracking-widest text-[#4a5f7a] uppercase mb-1.5';
+    "h-10 bg-[var(--bg-root)] border border-[var(--border)] rounded-lg px-3 py-2 text-[13px] text-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[#2563eb]/40 focus:border-[var(--accent-light)] transition-colors";
+  const labelCls = 'block text-xs font-medium tracking-wide text-[var(--text-muted)] uppercase mb-1.5';
 
   return (
     <div className="space-y-4">
@@ -331,8 +331,8 @@ export const Inventory: React.FC = () => {
       <div className="flex items-center justify-between">
         {/* Left: Title + record count */}
         <div className="flex items-center gap-3">
-          <h1 className="text-sm font-semibold text-white">Inventory Management</h1>
-          <span className="inline-flex items-center px-2 py-0.5 rounded border border-[#1e2d45] bg-[#0b1120] text-[10px] font-semibold tracking-widest text-[#4a5f7a] uppercase tabular-nums">
+          <h1 className="text-lg font-semibold text-[var(--text-primary)]">Inventory Management</h1>
+          <span className="badge badge-blue font-['JetBrains_Mono'] text-[11px] tabular-nums">
             {loading ? '—' : filteredProducts.length} records
           </span>
         </div>
@@ -341,14 +341,14 @@ export const Inventory: React.FC = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowBarcodeScanner(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#94a3b8] bg-[#0b1120] border border-[#1e2d45] rounded-md hover:border-[#243552] hover:text-white transition-colors"
+            className="btn-ghost inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium"
           >
             <Camera className="h-3.5 w-3.5" />
             Scan Barcode
           </button>
           <button
             onClick={triggerFileSelect}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#94a3b8] bg-[#0b1120] border border-[#1e2d45] rounded-md hover:border-[#243552] hover:text-white transition-colors"
+            className="btn-secondary inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium"
           >
             <Upload className="h-3.5 w-3.5" />
             Import CSV
@@ -367,7 +367,7 @@ export const Inventory: React.FC = () => {
               }
               setShowAddModal(true);
             }}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-white bg-[#3b82f6] border border-[#3b82f6] rounded-md hover:bg-[#2563eb] hover:border-[#2563eb] transition-colors"
+            className="btn-primary inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium"
           >
             <Plus className="h-3.5 w-3.5" />
             Add Product
@@ -377,13 +377,13 @@ export const Inventory: React.FC = () => {
 
       {/* ── CSV feedback ─────────────────────────────────────── */}
       {csvError && (
-        <div className="flex items-center gap-2 px-3 py-2 bg-red-950/20 border border-red-900/40 rounded-md text-xs text-[#ef4444]">
+        <div className="flex items-center gap-2 px-3 py-2 bg-[rgba(239,68,68,0.08)] rounded-lg text-xs text-[var(--danger)]">
           <X className="h-3.5 w-3.5 shrink-0" />
           {csvError}
         </div>
       )}
       {csvSuccess && (
-        <div className="flex items-center gap-2 px-3 py-2 bg-emerald-950/20 border border-emerald-900/40 rounded-md text-xs text-[#10b981]">
+        <div className="flex items-center gap-2 px-3 py-2 bg-[rgba(16,185,129,0.08)] rounded-lg text-xs text-[var(--success)]">
           {csvSuccess}
         </div>
       )}
@@ -401,26 +401,26 @@ export const Inventory: React.FC = () => {
 
       {/* ── Search Bar ───────────────────────────────────────── */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#4a5f7a]" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-muted)]" />
         <input
           type="text"
           placeholder="Search by product name, SKU, or category..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full bg-[#0b1120] border border-[#1e2d45] rounded-md pl-9 pr-4 py-2 text-sm text-[#cbd5e1] placeholder-[#4a5f7a] focus:outline-none focus:border-[#243552] transition-colors"
+          className="w-full h-10 bg-[var(--bg-surface)] border border-[var(--border)] rounded-lg pl-10 pr-4 py-2 text-[13px] text-[var(--text-primary)] placeholder-[#52525b] focus:outline-none focus:ring-2 focus:ring-[#2563eb]/40 focus:border-[var(--accent-light)] transition-colors"
         />
       </div>
 
       {/* ── Products Table Panel ──────────────────────────────── */}
-      <div className="bg-[#0b1120] border border-[#1e2d45] rounded-lg overflow-hidden">
+      <div className="panel overflow-hidden">
         {/* Panel Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[#1e2d45]">
-          <span className="text-xs font-semibold text-white">All Products</span>
+        <div className="panel-header flex items-center justify-between border-b border-[var(--border)]">
+          <span className="panel-title">All Products</span>
           <div className="flex items-center gap-2">
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="bg-[#070d19] border border-[#1e2d45] rounded-md px-2.5 py-1 text-[11px] text-[#94a3b8] focus:outline-none focus:border-[#243552] transition-colors"
+              className="h-8 bg-[var(--bg-root)] border border-[var(--border)] rounded-lg px-2.5 py-1 text-xs text-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[#2563eb]/40 focus:border-[var(--accent-light)] transition-colors"
             >
               <option value="">All Categories</option>
               {categories.map((c) => (
@@ -432,7 +432,7 @@ export const Inventory: React.FC = () => {
             <select
               value={minStockFilter}
               onChange={(e) => setMinStockFilter(e.target.value)}
-              className="bg-[#070d19] border border-[#1e2d45] rounded-md px-2.5 py-1 text-[11px] text-[#94a3b8] focus:outline-none focus:border-[#243552] transition-colors"
+              className="h-8 bg-[var(--bg-root)] border border-[var(--border)] rounded-lg px-2.5 py-1 text-xs text-[var(--text-secondary)] focus:outline-none focus:ring-2 focus:ring-[#2563eb]/40 focus:border-[var(--accent-light)] transition-colors"
             >
               <option value="">Min Stock: Any</option>
               <option value="0">Stock ≥ 0</option>
@@ -447,11 +447,11 @@ export const Inventory: React.FC = () => {
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-[#1e2d45] bg-[#0b1120]">
+              <tr className="border-b border-[var(--border)]">
                 {['SKU', 'Product Name', 'Category', 'Location', 'Unit Price', 'Stock', 'Reorder Pt', 'Status', 'Actions'].map((col) => (
                   <th
                     key={col}
-                    className="px-4 py-2.5 text-[10px] font-semibold tracking-widest text-[#4a5f7a] uppercase whitespace-nowrap"
+                    className="px-4 py-2.5 text-xs font-medium tracking-wide text-[var(--text-muted)] uppercase whitespace-nowrap"
                   >
                     {col}
                   </th>
@@ -460,20 +460,29 @@ export const Inventory: React.FC = () => {
             </thead>
             <tbody>
               {loading ? (
-                <tr>
-                  <td colSpan={9} className="px-4 py-12 text-center">
-                    <div className="flex flex-col items-center gap-2">
-                      <div className="h-5 w-5 border-2 border-[#1e2d45] border-t-[#3b82f6] rounded-full animate-spin" />
-                      <span className="text-xs text-[#4a5f7a]">Loading inventory...</span>
-                    </div>
-                  </td>
-                </tr>
+                /* ── Skeleton Loading ── */
+                <>
+                  {[...Array(5)].map((_, i) => (
+                    <tr key={i} className="border-b border-[var(--border)]">
+                      {[...Array(9)].map((_, j) => (
+                        <td key={j} className="px-4 py-3">
+                          <div className="skeleton h-4 rounded" style={{ width: j === 1 ? '140px' : j === 8 ? '80px' : '60px' }} />
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </>
               ) : filteredProducts.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="px-4 py-12 text-center">
-                    <div className="flex flex-col items-center gap-2">
-                      <Package className="h-8 w-8 text-[#1e2d45]" />
-                      <span className="text-xs text-[#4a5f7a]">No products match the current filters</span>
+                  <td colSpan={9} className="px-4 py-16 text-center">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="h-14 w-14 rounded-xl bg-[rgba(37,99,235,0.08)] flex items-center justify-center">
+                        <Package className="h-7 w-7 text-[var(--accent)]" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-[var(--text-primary)]">No products found</p>
+                        <p className="text-[13px] text-[var(--text-muted)] mt-0.5">No products match the current filters</p>
+                      </div>
                     </div>
                   </td>
                 </tr>
@@ -485,33 +494,34 @@ export const Inventory: React.FC = () => {
                   const primaryLocation = p.stockLevels[0]
                     ? `${p.stockLevels[0].aisle}-${p.stockLevels[0].shelf}-${p.stockLevels[0].bin}`
                     : '—';
+                  // Stock ratio for progress bar
+                  const stockRatio = p.reorderPoint > 0 ? Math.min(totalStock / (p.reorderPoint * 3), 1) : 1;
 
                   return (
                     <tr
                       key={p.id}
-                      className="border-b border-[#1e2d45] hover:bg-[#0f1729] transition-colors"
+                      className="border-b border-[var(--border)] hover:bg-[var(--bg-hover)] transition-colors"
                     >
                       {/* SKU */}
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="font-mono text-[11px] text-[#60a5fa]">{p.sku}</span>
+                        <span className="font-['JetBrains_Mono'] text-[11px] text-[var(--accent)]">{p.sku}</span>
                       </td>
 
                       {/* Product Name */}
                       <td className="px-4 py-3">
-                        <div className="text-[12px] font-medium text-[#cbd5e1] leading-snug">{p.name}</div>
+                        <div className="text-[13px] font-medium text-[var(--text-primary)] leading-snug">{p.name}</div>
                         {p.description && (
-                          <div className="text-[10px] text-[#4a5f7a] mt-0.5 truncate max-w-[180px]">{p.description}</div>
+                          <div className="text-[11px] text-[var(--text-muted)] mt-0.5 truncate max-w-[200px]">{p.description}</div>
                         )}
                       </td>
 
                       {/* Category */}
                       <td className="px-4 py-3 whitespace-nowrap">
                         <span
-                          className="inline-block px-2 py-0.5 rounded text-[10px] font-semibold tracking-wide border"
+                          className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-medium"
                           style={{
-                            backgroundColor: `${p.category.color}12`,
+                            backgroundColor: `${p.category.color}14`,
                             color: p.category.color,
-                            borderColor: `${p.category.color}28`,
                           }}
                         >
                           {p.category.name}
@@ -520,49 +530,57 @@ export const Inventory: React.FC = () => {
 
                       {/* Location */}
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <div className="flex items-center gap-1">
-                          <MapPin className="h-3 w-3 text-[#4a5f7a] shrink-0" />
-                          <span className="font-mono text-[11px] text-[#4a5f7a]">{primaryLocation}</span>
+                        <div className="flex items-center gap-1.5">
+                          <MapPin className="h-3 w-3 text-[var(--text-muted)] shrink-0" />
+                          <span className="font-['JetBrains_Mono'] text-[11px] text-[var(--text-secondary)]">{primaryLocation}</span>
                           {p.stockLevels.length > 1 && (
-                            <span className="text-[10px] text-[#4a5f7a]">+{p.stockLevels.length - 1}</span>
+                            <span className="text-[10px] text-[var(--text-muted)]">+{p.stockLevels.length - 1}</span>
                           )}
                         </div>
                       </td>
 
                       {/* Unit Price */}
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="font-mono text-[12px] text-white tabular-nums">
+                        <span className="font-['JetBrains_Mono'] text-[13px] text-[var(--text-primary)] tabular-nums">
                           ${p.unitPrice.toFixed(2)}
                         </span>
                       </td>
 
-                      {/* Stock qty */}
+                      {/* Stock qty with progress bar */}
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <span
-                          className={`font-mono text-[13px] font-semibold tabular-nums ${
-                            isLow ? 'text-[#ef4444]' : 'text-[#10b981]'
-                          }`}
-                        >
-                          {totalStock}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`font-['JetBrains_Mono'] text-[13px] font-semibold tabular-nums ${
+                              isLow ? 'text-[var(--danger)]' : 'text-[var(--success)]'
+                            }`}
+                          >
+                            {totalStock}
+                          </span>
+                          <div className="w-12 h-1.5 rounded-full bg-[#27272a] overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all ${isLow ? 'bg-[#ef4444]' : 'bg-[#10b981]'}`}
+                              style={{ width: `${stockRatio * 100}%` }}
+                            />
+                          </div>
+                        </div>
                         {p.unit && (
-                          <span className="text-[10px] text-[#4a5f7a] ml-1">{p.unit}</span>
+                          <span className="text-[10px] text-[var(--text-muted)] ml-1">{p.unit}</span>
                         )}
                       </td>
 
                       {/* Reorder Point */}
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="font-mono text-[11px] text-[#4a5f7a] tabular-nums">{p.reorderPoint}</span>
+                        <span className="font-['JetBrains_Mono'] text-[11px] text-[var(--text-muted)] tabular-nums">{p.reorderPoint}</span>
                       </td>
 
                       {/* Status */}
                       <td className="px-4 py-3 whitespace-nowrap">
                         {isLow ? (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold tracking-widest uppercase text-[#ef4444] bg-red-950/20 border border-red-900/40">
+                          <span className="badge badge-danger">
                             Low Stock
                           </span>
                         ) : (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold tracking-widest uppercase text-[#10b981] bg-emerald-950/20 border border-emerald-900/30">
+                          <span className="badge badge-success">
                             In Stock
                           </span>
                         )}
@@ -570,17 +588,17 @@ export const Inventory: React.FC = () => {
 
                       {/* Actions */}
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <div className="flex items-center gap-1">
-                          {/* Edit / Barcode */}
+                        <div className="flex items-center gap-0.5">
+                          {/* Barcode */}
                           <button
                             onClick={() => {
                               setSelectedProduct(p);
                               setShowCodeModal(true);
                             }}
-                            className="p-1.5 rounded text-[#4a5f7a] hover:text-[#94a3b8] hover:bg-[#0f1729] transition-colors"
+                            className="btn-ghost p-1.5 rounded-lg"
                             title="View Barcode / QR Code"
                           >
-                            <Barcode className="h-3.5 w-3.5" />
+                            <Barcode className="h-4 w-4" />
                           </button>
                           {/* Stock Adjust */}
                           <button
@@ -588,12 +606,12 @@ export const Inventory: React.FC = () => {
                               setAdjustData((prev) => ({ ...prev, productId: p.id }));
                               setShowAdjustModal(true);
                             }}
-                            className="p-1.5 rounded text-[#4a5f7a] hover:text-[#94a3b8] hover:bg-[#0f1729] transition-colors"
+                            className="btn-ghost p-1.5 rounded-lg"
                             title="Adjust Stock"
                           >
-                            <PackageOpen className="h-3.5 w-3.5" />
+                            <PackageOpen className="h-4 w-4" />
                           </button>
-                          {/* Edit (stub — opens add modal prefilled) */}
+                          {/* Edit */}
                           <button
                             onClick={() => {
                               setFormData({
@@ -613,10 +631,10 @@ export const Inventory: React.FC = () => {
                               });
                               setShowAddModal(true);
                             }}
-                            className="p-1.5 rounded text-[#4a5f7a] hover:text-[#94a3b8] hover:bg-[#0f1729] transition-colors"
+                            className="btn-ghost p-1.5 rounded-lg"
                             title="Edit Product"
                           >
-                            <Pencil className="h-3.5 w-3.5" />
+                            <Pencil className="h-4 w-4" />
                           </button>
                         </div>
                       </td>
@@ -630,13 +648,13 @@ export const Inventory: React.FC = () => {
 
         {/* Table footer */}
         {!loading && filteredProducts.length > 0 && (
-          <div className="px-4 py-2.5 border-t border-[#1e2d45] flex items-center justify-between">
-            <span className="text-[10px] text-[#4a5f7a]">
-              Showing <span className="text-[#94a3b8] font-semibold">{filteredProducts.length}</span> product{filteredProducts.length !== 1 ? 's' : ''}
+          <div className="px-4 py-2.5 border-t border-[var(--border)] flex items-center justify-between">
+            <span className="text-xs text-[var(--text-muted)]">
+              Showing <span className="text-[var(--text-secondary)] font-semibold">{filteredProducts.length}</span> product{filteredProducts.length !== 1 ? 's' : ''}
             </span>
-            <span className="text-[10px] text-[#4a5f7a]">
+            <span className="text-xs text-[var(--text-muted)] flex items-center gap-1.5">
               Live sync active
-              <span className="inline-block ml-1.5 h-1.5 w-1.5 rounded-full bg-[#10b981] animate-pulse" />
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#10b981] animate-pulse" />
             </span>
           </div>
         )}
@@ -646,14 +664,14 @@ export const Inventory: React.FC = () => {
           ADD / EDIT PRODUCT MODAL
       ═══════════════════════════════════════════════════════ */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#070d19]/80 backdrop-blur-sm">
-          <div className="w-full max-w-lg bg-[#0b1120] border border-[#1e2d45] rounded-lg shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+        <div className="modal-overlay">
+          <div className="modal w-full max-w-lg flex flex-col max-h-[90vh] overflow-hidden">
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[#1e2d45]">
-              <h3 className="text-sm font-semibold text-white">Add New Product</h3>
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)]">
+              <h3 className="text-sm font-semibold text-[var(--text-primary)]">Add New Product</h3>
               <button
                 onClick={() => setShowAddModal(false)}
-                className="p-1 rounded text-[#4a5f7a] hover:text-white hover:bg-[#0f1729] transition-colors"
+                className="btn-ghost p-1.5 rounded-lg"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -665,7 +683,7 @@ export const Inventory: React.FC = () => {
                 {/* Row: Name / SKU */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className={labelCls}>Product Name <span className="text-[#ef4444]">*</span></label>
+                    <label className={labelCls}>Product Name <span className="text-[var(--danger)]">*</span></label>
                     <input
                       type="text"
                       required
@@ -676,7 +694,7 @@ export const Inventory: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className={labelCls}>SKU <span className="text-[#4a5f7a] normal-case">(auto if blank)</span></label>
+                    <label className={labelCls}>SKU <span className="text-[var(--text-muted)] normal-case">(auto if blank)</span></label>
                     <input
                       type="text"
                       value={formData.sku}
@@ -687,10 +705,10 @@ export const Inventory: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Row: Category / Location */}
+                {/* Row: Category / Description */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className={labelCls}>Category <span className="text-[#ef4444]">*</span></label>
+                    <label className={labelCls}>Category <span className="text-[var(--danger)]">*</span></label>
                     <select
                       value={formData.categoryId}
                       onChange={(e) => setFormData((prev) => ({ ...prev, categoryId: e.target.value }))}
@@ -717,7 +735,7 @@ export const Inventory: React.FC = () => {
                 {/* Row: Unit Price / Reorder Point */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className={labelCls}>Unit Price ($) <span className="text-[#ef4444]">*</span></label>
+                    <label className={labelCls}>Unit Price ($) <span className="text-[var(--danger)]">*</span></label>
                     <input
                       type="number"
                       step="0.01"
@@ -729,7 +747,7 @@ export const Inventory: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className={labelCls}>Reorder Point <span className="text-[#ef4444]">*</span></label>
+                    <label className={labelCls}>Reorder Point <span className="text-[var(--danger)]">*</span></label>
                     <input
                       type="number"
                       required
@@ -743,7 +761,7 @@ export const Inventory: React.FC = () => {
                 {/* Row: Reorder Qty / Safety Stock */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className={labelCls}>Reorder Qty <span className="text-[#ef4444]">*</span></label>
+                    <label className={labelCls}>Reorder Qty <span className="text-[var(--danger)]">*</span></label>
                     <input
                       type="number"
                       required
@@ -753,7 +771,7 @@ export const Inventory: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className={labelCls}>Safety Stock <span className="text-[#ef4444]">*</span></label>
+                    <label className={labelCls}>Safety Stock <span className="text-[var(--danger)]">*</span></label>
                     <input
                       type="number"
                       required
@@ -765,8 +783,8 @@ export const Inventory: React.FC = () => {
                 </div>
 
                 {/* Initial Stock Placement */}
-                <div className="border-t border-[#1e2d45] pt-4">
-                  <p className="text-[10px] font-semibold tracking-widest text-[#4a5f7a] uppercase mb-3">
+                <div className="border-t border-[var(--border)] pt-4">
+                  <p className="text-xs font-medium tracking-wide text-[var(--text-muted)] uppercase mb-3">
                     Initial Stock Placement
                   </p>
                   <div className="grid grid-cols-2 gap-3 mb-3">
@@ -799,7 +817,7 @@ export const Inventory: React.FC = () => {
                         type="text"
                         value={formData.aisle}
                         onChange={(e) => setFormData((prev) => ({ ...prev, aisle: e.target.value.toUpperCase() }))}
-                        className={`${inputCls} text-center font-mono`}
+                        className={`${inputCls} text-center font-['JetBrains_Mono']`}
                         maxLength={2}
                       />
                     </div>
@@ -809,7 +827,7 @@ export const Inventory: React.FC = () => {
                         type="text"
                         value={formData.shelf}
                         onChange={(e) => setFormData((prev) => ({ ...prev, shelf: e.target.value }))}
-                        className={`${inputCls} text-center font-mono`}
+                        className={`${inputCls} text-center font-['JetBrains_Mono']`}
                         maxLength={3}
                       />
                     </div>
@@ -819,7 +837,7 @@ export const Inventory: React.FC = () => {
                         type="text"
                         value={formData.bin}
                         onChange={(e) => setFormData((prev) => ({ ...prev, bin: e.target.value }))}
-                        className={`${inputCls} text-center font-mono`}
+                        className={`${inputCls} text-center font-['JetBrains_Mono']`}
                         maxLength={3}
                       />
                     </div>
@@ -828,17 +846,17 @@ export const Inventory: React.FC = () => {
               </div>
 
               {/* Modal Footer */}
-              <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-[#1e2d45] bg-[#0b1120]">
+              <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-[var(--border)] bg-[var(--bg-surface)]">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 text-xs font-semibold text-[#94a3b8] bg-transparent border border-[#1e2d45] rounded-md hover:border-[#243552] hover:text-white transition-colors"
+                  className="btn-secondary px-4 py-2 text-xs font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-xs font-semibold text-white bg-[#3b82f6] border border-[#3b82f6] rounded-md hover:bg-[#2563eb] hover:border-[#2563eb] transition-colors"
+                  className="btn-primary px-4 py-2 text-xs font-medium"
                 >
                   Save Product
                 </button>
@@ -852,14 +870,14 @@ export const Inventory: React.FC = () => {
           STOCK ADJUST MODAL
       ═══════════════════════════════════════════════════════ */}
       {showAdjustModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#070d19]/80 backdrop-blur-sm">
-          <div className="w-full max-w-sm bg-[#0b1120] border border-[#1e2d45] rounded-lg shadow-2xl flex flex-col overflow-hidden">
+        <div className="modal-overlay">
+          <div className="modal w-full max-w-sm flex flex-col overflow-hidden">
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[#1e2d45]">
-              <h3 className="text-sm font-semibold text-white">Adjust Stock</h3>
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)]">
+              <h3 className="text-sm font-semibold text-[var(--text-primary)]">Adjust Stock</h3>
               <button
                 onClick={() => setShowAdjustModal(false)}
-                className="p-1 rounded text-[#4a5f7a] hover:text-white hover:bg-[#0f1729] transition-colors"
+                className="btn-ghost p-1.5 rounded-lg"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -870,7 +888,7 @@ export const Inventory: React.FC = () => {
               <div className="px-5 py-4 space-y-4">
                 {/* Product select */}
                 <div>
-                  <label className={labelCls}>Product <span className="text-[#ef4444]">*</span></label>
+                  <label className={labelCls}>Product <span className="text-[var(--danger)]">*</span></label>
                   <select
                     required
                     value={adjustData.productId}
@@ -889,7 +907,7 @@ export const Inventory: React.FC = () => {
                 {/* Type + Quantity */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className={labelCls}>Type <span className="text-[#ef4444]">*</span></label>
+                    <label className={labelCls}>Type <span className="text-[var(--danger)]">*</span></label>
                     <select
                       value={adjustData.type}
                       onChange={(e) => setAdjustData((prev) => ({ ...prev, type: e.target.value }))}
@@ -901,7 +919,7 @@ export const Inventory: React.FC = () => {
                     </select>
                   </div>
                   <div>
-                    <label className={labelCls}>Quantity <span className="text-[#ef4444]">*</span></label>
+                    <label className={labelCls}>Quantity <span className="text-[var(--danger)]">*</span></label>
                     <input
                       type="number"
                       required
@@ -915,7 +933,7 @@ export const Inventory: React.FC = () => {
 
                 {/* Warehouse */}
                 <div>
-                  <label className={labelCls}>Warehouse <span className="text-[#ef4444]">*</span></label>
+                  <label className={labelCls}>Warehouse <span className="text-[var(--danger)]">*</span></label>
                   <select
                     required
                     value={adjustData.warehouseId}
@@ -937,7 +955,7 @@ export const Inventory: React.FC = () => {
                       placeholder="Aisle"
                       value={adjustData.aisle}
                       onChange={(e) => setAdjustData((prev) => ({ ...prev, aisle: e.target.value.toUpperCase() }))}
-                      className={`${inputCls} text-center font-mono`}
+                      className={`${inputCls} text-center font-['JetBrains_Mono']`}
                       maxLength={2}
                     />
                     <input
@@ -945,7 +963,7 @@ export const Inventory: React.FC = () => {
                       placeholder="Shelf"
                       value={adjustData.shelf}
                       onChange={(e) => setAdjustData((prev) => ({ ...prev, shelf: e.target.value }))}
-                      className={`${inputCls} text-center font-mono`}
+                      className={`${inputCls} text-center font-['JetBrains_Mono']`}
                       maxLength={3}
                     />
                     <input
@@ -953,7 +971,7 @@ export const Inventory: React.FC = () => {
                       placeholder="Bin"
                       value={adjustData.bin}
                       onChange={(e) => setAdjustData((prev) => ({ ...prev, bin: e.target.value }))}
-                      className={`${inputCls} text-center font-mono`}
+                      className={`${inputCls} text-center font-['JetBrains_Mono']`}
                       maxLength={3}
                     />
                   </div>
@@ -973,17 +991,17 @@ export const Inventory: React.FC = () => {
               </div>
 
               {/* Modal Footer */}
-              <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-[#1e2d45] bg-[#0b1120]">
+              <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-[var(--border)] bg-[var(--bg-surface)]">
                 <button
                   type="button"
                   onClick={() => setShowAdjustModal(false)}
-                  className="px-4 py-2 text-xs font-semibold text-[#94a3b8] bg-transparent border border-[#1e2d45] rounded-md hover:border-[#243552] hover:text-white transition-colors"
+                  className="btn-secondary px-4 py-2 text-xs font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 text-xs font-semibold text-white bg-[#3b82f6] border border-[#3b82f6] rounded-md hover:bg-[#2563eb] hover:border-[#2563eb] transition-colors"
+                  className="btn-primary px-4 py-2 text-xs font-medium"
                 >
                   Apply Adjustment
                 </button>
@@ -997,14 +1015,14 @@ export const Inventory: React.FC = () => {
           BARCODE / QR CODE MODAL
       ═══════════════════════════════════════════════════════ */}
       {showCodeModal && selectedProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#070d19]/80 backdrop-blur-sm">
-          <div className="w-full max-w-sm bg-[#0b1120] border border-[#1e2d45] rounded-lg shadow-2xl overflow-hidden">
+        <div className="modal-overlay">
+          <div className="modal w-full max-w-sm overflow-hidden">
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[#1e2d45]">
-              <h3 className="text-sm font-semibold text-white">Product Label</h3>
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)]">
+              <h3 className="text-sm font-semibold text-[var(--text-primary)]">Product Label</h3>
               <button
                 onClick={() => setShowCodeModal(false)}
-                className="p-1 rounded text-[#4a5f7a] hover:text-white hover:bg-[#0f1729] transition-colors"
+                className="btn-ghost p-1.5 rounded-lg"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -1014,12 +1032,12 @@ export const Inventory: React.FC = () => {
             <div className="px-5 py-4 space-y-4">
               {/* Product info */}
               <div className="text-center">
-                <p className="text-xs font-medium text-[#cbd5e1]">{selectedProduct.name}</p>
-                <p className="font-mono text-[11px] text-[#60a5fa] mt-0.5">{selectedProduct.sku}</p>
+                <p className="text-[13px] font-medium text-[var(--text-primary)]">{selectedProduct.name}</p>
+                <p className="font-['JetBrains_Mono'] text-[11px] text-[var(--accent)] mt-0.5">{selectedProduct.sku}</p>
               </div>
 
               {/* Barcode */}
-              <div className="bg-white rounded-md p-4 flex flex-col items-center border border-[#1e2d45]">
+              <div className="bg-white rounded-xl p-4 flex flex-col items-center">
                 <div className="flex justify-center items-end h-14 gap-[1px] px-2">
                   {[...Array(24)].map((_, i) => {
                     const isThick = i % 3 === 0 || i % 7 === 0;
@@ -1036,13 +1054,13 @@ export const Inventory: React.FC = () => {
                     );
                   })}
                 </div>
-                <div className="text-[10px] font-mono text-black font-bold tracking-widest mt-2">
+                <div className="text-[10px] font-['JetBrains_Mono'] text-black font-bold tracking-widest mt-2">
                   {selectedProduct.sku}
                 </div>
               </div>
 
               {/* QR Code */}
-              <div className="bg-white rounded-md p-3 flex flex-col items-center border border-[#1e2d45] max-w-[120px] mx-auto">
+              <div className="bg-white rounded-xl p-3 flex flex-col items-center max-w-[120px] mx-auto">
                 <div className="grid grid-cols-5 gap-0.5">
                   {[...Array(25)].map((_, i) => {
                     const isFilled = i % 2 === 0 || i % 3 === 0 || i === 0 || i === 4 || i === 20 || i === 24;
@@ -1054,17 +1072,17 @@ export const Inventory: React.FC = () => {
                     );
                   })}
                 </div>
-                <div className="text-[8px] font-mono text-[#4a5f7a] mt-1.5 uppercase tracking-widest">
+                <div className="text-[8px] font-['JetBrains_Mono'] text-[var(--text-muted)] mt-1.5 uppercase tracking-widest">
                   Scan QR
                 </div>
               </div>
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-[#1e2d45]">
+            <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-[var(--border)]">
               <button
                 onClick={() => window.print()}
-                className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-[#94a3b8] border border-[#1e2d45] rounded-md hover:border-[#243552] hover:text-white transition-colors"
+                className="btn-secondary inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium"
               >
                 <FileDown className="h-3.5 w-3.5" />
                 Print Label

@@ -141,7 +141,7 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScan, onClose 
           {/* Status overlay */}
           <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/90 to-transparent">
             {error ? (
-              <div className="flex items-center space-x-2 text-red-400 text-xs">
+              <div className="flex items-center space-x-2 text-[var(--danger)] text-xs">
                 <AlertTriangle className="h-4 w-4 flex-shrink-0" />
                 <span>{error}</span>
               </div>

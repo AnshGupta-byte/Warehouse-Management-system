@@ -122,25 +122,25 @@ export const Forecasting: React.FC = () => {
   return (
     <div className="space-y-0">
       {/* ── Page Toolbar ── */}
-      <div className="flex items-center justify-between px-5 py-3 border-b border-[#1e2d45] bg-[#0b1120]">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] bg-[var(--bg-surface)]">
         <div>
-          <h1 className="text-[14px] font-semibold text-white leading-tight">
+          <h1 className="text-lg font-semibold text-[var(--text-primary)] leading-tight">
             Demand Forecasting &amp; Replenishment
           </h1>
-          <p className="text-[11px] text-[#4a5f7a] mt-0.5">
+          <p className="text-[13px] text-[var(--text-muted)] mt-0.5">
             XGBoost demand model · Auto-PO replenishment signals · ABC classification
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-[10px] font-semibold tracking-widest text-[#4a5f7a] uppercase px-2 py-1 border border-[#1e2d45] rounded-md bg-[#070d19]">
+          <span className="text-xs font-medium tracking-wide text-[var(--text-muted)] uppercase px-2.5 py-1 border border-[var(--border)] rounded-lg bg-[var(--bg-root)]">
             AI Engine: XGBoost
           </span>
           <button
             onClick={handleTriggerForecast}
             disabled={triggering}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-medium text-[#94a3b8] bg-[#070d19] border border-[#1e2d45] rounded-md hover:border-[#243552] hover:text-white disabled:opacity-50 transition-colors"
+            className="btn-secondary flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium text-[var(--text-secondary)] bg-[var(--bg-root)] border border-[var(--border)] rounded-lg hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)] disabled:opacity-50 transition-colors"
           >
-            <RefreshCw className={`h-3.5 w-3.5 ${triggering ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-4 w-4 ${triggering ? 'animate-spin' : ''}`} />
             {triggering ? 'Retraining…' : 'Retrain Models'}
           </button>
         </div>
@@ -148,31 +148,31 @@ export const Forecasting: React.FC = () => {
 
       {/* ── Success bar ── */}
       {successMsg && (
-        <div className="flex items-center gap-2 px-5 py-2 bg-[#10b98112] border-b border-[#10b98130] text-[11px] text-[#10b981] font-medium">
-          <CheckCircle className="h-3.5 w-3.5 shrink-0" />
+        <div className="flex items-center gap-2 px-6 py-2.5 bg-[rgba(16,185,129,0.08)] border-b border-[var(--border)] text-[13px] text-[var(--success)] font-medium">
+          <CheckCircle className="h-4 w-4 shrink-0" />
           {successMsg}
         </div>
       )}
 
-      <div className="p-5 space-y-5">
+      <div className="p-6 space-y-6">
         {loading ? (
           <div className="flex h-64 items-center justify-center">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#3b82f6] border-t-transparent" />
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--accent-light)] border-t-transparent" />
           </div>
         ) : (
           <>
             {/* ── Main 2-col layout ── */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
               {/* ── LEFT: Forecast Chart Panel (2/3) ── */}
-              <div className="lg:col-span-2 bg-[#0b1120] border border-[#1e2d45] rounded-md overflow-hidden">
+              <div className="lg:col-span-2 panel">
                 {/* panel-header */}
-                <div className="flex items-center justify-between px-4 py-2.5 border-b border-[#1e2d45] bg-[#0b1120]">
-                  <span className="text-[12px] font-semibold text-white">Demand Trajectory</span>
+                <div className="panel-header flex items-center justify-between">
+                  <span className="panel-title">Demand Trajectory</span>
                   <select
                     value={selectedProductId}
                     onChange={(e) => setSelectedProductId(e.target.value)}
-                    className="bg-[#070d19] border border-[#1e2d45] rounded-md px-2.5 py-1 text-[11px] text-[#94a3b8] focus:outline-none focus:border-[#243552] hover:border-[#243552] transition-colors cursor-pointer"
+                    className="bg-[var(--bg-root)] border border-[var(--border)] rounded-lg px-3 py-1.5 text-[13px] text-[var(--text-secondary)] focus:outline-none focus:ring-1 focus:ring-[#2563eb] hover:border-[var(--border-strong)] transition-colors cursor-pointer"
                   >
                     {recommendations.map((r) => (
                       <option key={r.productId} value={r.productId}>
@@ -187,36 +187,36 @@ export const Forecasting: React.FC = () => {
                   <div className="h-56 w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={getProductChartData()} margin={{ top: 4, right: 12, left: -16, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#111e35" vertical={false} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
                         <XAxis
                           dataKey="name"
-                          stroke="#1e2d45"
-                          tick={{ fill: '#4a5f7a', fontSize: 10 }}
+                          stroke="#27272a"
+                          tick={{ fill: '#52525b', fontSize: 10 }}
                           tickLine={false}
-                          axisLine={{ stroke: '#1e2d45' }}
+                          axisLine={{ stroke: '#27272a' }}
                         />
                         <YAxis
-                          stroke="#1e2d45"
-                          tick={{ fill: '#4a5f7a', fontSize: 10 }}
+                          stroke="#27272a"
+                          tick={{ fill: '#52525b', fontSize: 10 }}
                           tickLine={false}
                           axisLine={false}
                         />
                         <Tooltip
                           contentStyle={{
-                            backgroundColor: '#0b1120',
-                            borderColor: '#1e2d45',
-                            borderRadius: '4px',
-                            fontSize: '11px',
+                            backgroundColor: '#18181b',
+                            borderColor: '#27272a',
+                            borderRadius: '8px',
+                            fontSize: '12px',
                           }}
-                          labelStyle={{ color: '#cbd5e1', fontWeight: 600 }}
-                          itemStyle={{ color: '#94a3b8' }}
+                          labelStyle={{ color: '#fafafa', fontWeight: 600 }}
+                          itemStyle={{ color: '#a1a1aa' }}
                         />
                         <Legend
                           verticalAlign="top"
                           height={28}
                           iconType="circle"
                           iconSize={6}
-                          wrapperStyle={{ fontSize: '11px', color: '#4a5f7a' }}
+                          wrapperStyle={{ fontSize: '12px', color: '#52525b' }}
                         />
                         <Line
                           type="monotone"
@@ -243,19 +243,19 @@ export const Forecasting: React.FC = () => {
 
                 {/* Metric pills below chart */}
                 {selectedProductDetails && (
-                  <div className="flex items-center gap-2 px-4 py-3 border-t border-[#111e35]">
-                    <span className="text-[10px] font-semibold tracking-widest text-[#4a5f7a] uppercase mr-1">Forecast</span>
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#3b82f608] border border-[#3b82f620] text-[11px] font-medium text-[#3b82f6] tabular-nums">
-                      30-Day: <span className="font-semibold">{selectedProductDetails.next30DaysForecast} units</span>
+                  <div className="flex items-center gap-2.5 px-4 py-3 border-t border-[var(--border)]">
+                    <span className="text-xs font-medium tracking-wide text-[var(--text-muted)] uppercase mr-1">Forecast</span>
+                    <span className="badge badge-blue font-['JetBrains_Mono'] text-xs tabular-nums">
+                      30d: <span className="font-semibold">{selectedProductDetails.next30DaysForecast} units</span>
                     </span>
                     {selectedProductDetails.next60DaysForecast != null && (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#3b82f608] border border-[#3b82f620] text-[11px] font-medium text-[#3b82f6] tabular-nums">
-                        60-Day: <span className="font-semibold">{selectedProductDetails.next60DaysForecast} units</span>
+                      <span className="badge badge-blue font-['JetBrains_Mono'] text-xs tabular-nums">
+                        60d: <span className="font-semibold">{selectedProductDetails.next60DaysForecast} units</span>
                       </span>
                     )}
                     {selectedProductDetails.next90DaysForecast != null && (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#3b82f608] border border-[#3b82f620] text-[11px] font-medium text-[#3b82f6] tabular-nums">
-                        90-Day: <span className="font-semibold">{selectedProductDetails.next90DaysForecast} units</span>
+                      <span className="badge badge-blue font-['JetBrains_Mono'] text-xs tabular-nums">
+                        90d: <span className="font-semibold">{selectedProductDetails.next90DaysForecast} units</span>
                       </span>
                     )}
                   </div>
@@ -263,10 +263,10 @@ export const Forecasting: React.FC = () => {
               </div>
 
               {/* ── RIGHT: Replenishment Signal Panel (1/3) ── */}
-              <div className="bg-[#0b1120] border border-[#1e2d45] rounded-md overflow-hidden flex flex-col">
+              <div className="panel flex flex-col">
                 {/* panel-header */}
-                <div className="px-4 py-2.5 border-b border-[#1e2d45] bg-[#0b1120]">
-                  <span className="text-[12px] font-semibold text-white">Replenishment Signal</span>
+                <div className="panel-header">
+                  <span className="panel-title">Replenishment Signal</span>
                 </div>
 
                 {selectedProductDetails ? (
@@ -282,10 +282,10 @@ export const Forecasting: React.FC = () => {
                       ].map(({ label, value }, i, arr) => (
                         <div
                           key={label}
-                          className={`flex justify-between items-center py-2.5 px-4 ${i < arr.length - 1 ? 'border-b border-[#111e35]' : ''}`}
+                          className={`flex justify-between items-center py-3 px-4 ${i < arr.length - 1 ? 'border-b border-[var(--border)]' : ''}`}
                         >
-                          <span className="text-[11px] text-[#4a5f7a]">{label}</span>
-                          <span className="text-[12px] font-medium text-[#cbd5e1] tabular-nums truncate max-w-[140px] text-right">
+                          <span className="text-[13px] text-[var(--text-muted)]">{label}</span>
+                          <span className="text-[13px] font-medium text-[var(--text-primary)] font-['JetBrains_Mono'] tabular-nums truncate max-w-[140px] text-right">
                             {value}
                           </span>
                         </div>
@@ -293,26 +293,36 @@ export const Forecasting: React.FC = () => {
                     </div>
 
                     {/* Status block */}
-                    <div className="p-3 border-t border-[#111e35]">
+                    <div className="p-4 border-t border-[var(--border)]">
                       {isReorderNeeded ? (
-                        <div className="bg-[#f59e0b10] border border-[#f59e0b30] rounded-md p-3 text-center">
-                          <span className="inline-block px-2 py-0.5 text-[10px] font-semibold tracking-widest uppercase bg-[#f59e0b15] border border-[#f59e0b40] text-[#f59e0b] rounded-sm mb-2">
-                            Replenishment Required
-                          </span>
-                          <p className="text-[10px] text-[#4a5f7a] mb-1.5">
+                        <div className="rounded-xl border-l-4 border-l-[#f59e0b] bg-[rgba(245,158,11,0.08)] p-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="h-8 w-8 rounded-full bg-[rgba(245,158,11,0.15)] flex items-center justify-center">
+                              <AlertTriangle className="h-4 w-4 text-[var(--warning)]" />
+                            </div>
+                            <span className="text-xs font-semibold tracking-wide uppercase text-[var(--warning)]">
+                              Replenishment Required
+                            </span>
+                          </div>
+                          <p className="text-[13px] text-[var(--text-muted)] mb-2">
                             Stock is below reorder point. Recommended PO quantity:
                           </p>
-                          <span className="text-[22px] font-bold text-[#f59e0b] tabular-nums leading-none">
+                          <span className="text-[28px] font-bold text-[var(--warning)] font-['JetBrains_Mono'] tabular-nums leading-none">
                             {selectedProductDetails.recommendedQty}
                           </span>
-                          <span className="text-[11px] text-[#f59e0b] ml-1">units</span>
+                          <span className="text-[13px] text-[var(--warning)] ml-1.5">units</span>
                         </div>
                       ) : (
-                        <div className="bg-[#10b98110] border border-[#10b98130] rounded-md p-3 text-center">
-                          <span className="inline-block px-2 py-0.5 text-[10px] font-semibold tracking-widest uppercase bg-[#10b98115] border border-[#10b98140] text-[#10b981] rounded-sm mb-2">
-                            Stock Optimal
-                          </span>
-                          <p className="text-[10px] text-[#4a5f7a]">
+                        <div className="rounded-xl border-l-4 border-l-[#10b981] bg-[rgba(16,185,129,0.08)] p-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="h-8 w-8 rounded-full bg-[rgba(16,185,129,0.15)] flex items-center justify-center">
+                              <ShieldCheck className="h-4 w-4 text-[var(--success)]" />
+                            </div>
+                            <span className="text-xs font-semibold tracking-wide uppercase text-[var(--success)]">
+                              Stock Optimal
+                            </span>
+                          </div>
+                          <p className="text-[13px] text-[var(--text-muted)]">
                             No replenishment action required. Inventory above safety threshold.
                           </p>
                         </div>
@@ -320,7 +330,7 @@ export const Forecasting: React.FC = () => {
                     </div>
                   </>
                 ) : (
-                  <div className="flex-1 flex items-center justify-center text-[11px] text-[#4a5f7a]">
+                  <div className="flex-1 flex items-center justify-center text-[13px] text-[var(--text-muted)]">
                     Select a product
                   </div>
                 )}
@@ -328,11 +338,11 @@ export const Forecasting: React.FC = () => {
             </div>
 
             {/* ── Replenishment Matrix Table ── */}
-            <div className="bg-[#0b1120] border border-[#1e2d45] rounded-md overflow-hidden mt-5">
+            <div className="panel mt-6">
               {/* panel-header */}
-              <div className="flex items-center gap-2.5 px-4 py-2.5 border-b border-[#1e2d45] bg-[#0b1120]">
-                <span className="text-[12px] font-semibold text-white">Auto-PO Replenishment Matrix</span>
-                <span className="inline-flex items-center px-1.5 py-0.5 rounded-sm bg-[#3b82f610] border border-[#3b82f625] text-[10px] font-semibold text-[#3b82f6]">
+              <div className="panel-header flex items-center gap-2.5">
+                <span className="panel-title">Auto-PO Replenishment Matrix</span>
+                <span className="badge badge-blue text-xs font-semibold font-['JetBrains_Mono']">
                   {recommendations.length}
                 </span>
               </div>
@@ -340,15 +350,15 @@ export const Forecasting: React.FC = () => {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="bg-[#0b1120] border-b border-[#1e2d45]">
-                      <th className="px-4 py-2 text-[10px] font-semibold tracking-widest text-[#4a5f7a] uppercase whitespace-nowrap">Product</th>
-                      <th className="px-4 py-2 text-[10px] font-semibold tracking-widest text-[#4a5f7a] uppercase whitespace-nowrap">SKU</th>
-                      <th className="px-4 py-2 text-[10px] font-semibold tracking-widest text-[#4a5f7a] uppercase whitespace-nowrap text-right">Current Stock</th>
-                      <th className="px-4 py-2 text-[10px] font-semibold tracking-widest text-[#4a5f7a] uppercase whitespace-nowrap text-right">Safety Stock</th>
-                      <th className="px-4 py-2 text-[10px] font-semibold tracking-widest text-[#4a5f7a] uppercase whitespace-nowrap text-right">Reorder Pt.</th>
-                      <th className="px-4 py-2 text-[10px] font-semibold tracking-widest text-[#4a5f7a] uppercase whitespace-nowrap">ABC</th>
-                      <th className="px-4 py-2 text-[10px] font-semibold tracking-widest text-[#4a5f7a] uppercase whitespace-nowrap text-right">30-Day Fcst</th>
-                      <th className="px-4 py-2 text-[10px] font-semibold tracking-widest text-[#4a5f7a] uppercase whitespace-nowrap text-right">Required Action</th>
+                    <tr className="border-b border-[var(--border)]">
+                      <th className="px-4 py-3 text-xs font-medium tracking-wide text-[var(--text-muted)] uppercase whitespace-nowrap">Product</th>
+                      <th className="px-4 py-3 text-xs font-medium tracking-wide text-[var(--text-muted)] uppercase whitespace-nowrap">SKU</th>
+                      <th className="px-4 py-3 text-xs font-medium tracking-wide text-[var(--text-muted)] uppercase whitespace-nowrap text-right">Current Stock</th>
+                      <th className="px-4 py-3 text-xs font-medium tracking-wide text-[var(--text-muted)] uppercase whitespace-nowrap text-right">Safety Stock</th>
+                      <th className="px-4 py-3 text-xs font-medium tracking-wide text-[var(--text-muted)] uppercase whitespace-nowrap text-right">Reorder Pt.</th>
+                      <th className="px-4 py-3 text-xs font-medium tracking-wide text-[var(--text-muted)] uppercase whitespace-nowrap">ABC</th>
+                      <th className="px-4 py-3 text-xs font-medium tracking-wide text-[var(--text-muted)] uppercase whitespace-nowrap text-right">30-Day Fcst</th>
+                      <th className="px-4 py-3 text-xs font-medium tracking-wide text-[var(--text-muted)] uppercase whitespace-nowrap text-right">Required Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -356,48 +366,48 @@ export const Forecasting: React.FC = () => {
                       <tr
                         key={r.productId}
                         onClick={() => setSelectedProductId(r.productId)}
-                        className={`border-b border-[#0f1729] cursor-pointer transition-colors hover:bg-[#0f1729] ${
-                          r.productId === selectedProductId ? 'bg-[#0f1729]' : ''
+                        className={`border-b border-[var(--border)] cursor-pointer transition-colors hover:bg-[var(--bg-hover)] ${
+                          r.productId === selectedProductId ? 'bg-[var(--bg-elevated)]' : ''
                         }`}
                       >
-                        <td className="px-4 py-2.5">
-                          <span className="text-[12px] font-medium text-[#cbd5e1] leading-tight block">
+                        <td className="px-4 py-3">
+                          <span className="text-[13px] font-medium text-[var(--text-primary)] leading-tight block">
                             {r.name}
                           </span>
                         </td>
-                        <td className="px-4 py-2.5">
-                          <span className="text-[11px] font-mono text-[#4a5f7a]">{r.sku}</span>
+                        <td className="px-4 py-3">
+                          <span className="text-[13px] font-['JetBrains_Mono'] text-[var(--text-muted)]">{r.sku}</span>
                         </td>
-                        <td className="px-4 py-2.5 text-right">
-                          <span className="text-[12px] font-medium text-[#cbd5e1] tabular-nums">{r.totalStock}</span>
+                        <td className="px-4 py-3 text-right">
+                          <span className="text-[13px] font-medium text-[var(--text-primary)] font-['JetBrains_Mono'] tabular-nums">{r.totalStock}</span>
                         </td>
-                        <td className="px-4 py-2.5 text-right">
-                          <span className="text-[12px] text-[#94a3b8] tabular-nums">{r.safetyStock}</span>
+                        <td className="px-4 py-3 text-right">
+                          <span className="text-[13px] text-[var(--text-secondary)] font-['JetBrains_Mono'] tabular-nums">{r.safetyStock}</span>
                         </td>
-                        <td className="px-4 py-2.5 text-right">
-                          <span className="text-[12px] text-[#94a3b8] tabular-nums">{r.reorderPoint}</span>
+                        <td className="px-4 py-3 text-right">
+                          <span className="text-[13px] text-[var(--text-secondary)] font-['JetBrains_Mono'] tabular-nums">{r.reorderPoint}</span>
                         </td>
-                        <td className="px-4 py-2.5">
-                          <span className={`inline-flex items-center px-1.5 py-0.5 rounded-sm text-[10px] font-semibold border ${
+                        <td className="px-4 py-3">
+                          <span className={`badge ${
                             r.abcClass === 'A'
-                              ? 'bg-[#ef444410] border-[#ef444430] text-[#ef4444]'
+                              ? 'badge-red'
                               : r.abcClass === 'B'
-                              ? 'bg-[#f59e0b10] border-[#f59e0b30] text-[#f59e0b]'
-                              : 'bg-[#1e2d45] border-[#243552] text-[#4a5f7a]'
+                              ? 'badge-amber'
+                              : 'badge-gray'
                           }`}>
                             {r.abcClass}
                           </span>
                         </td>
-                        <td className="px-4 py-2.5 text-right">
-                          <span className="text-[12px] text-[#94a3b8] tabular-nums">{r.next30DaysForecast}</span>
+                        <td className="px-4 py-3 text-right">
+                          <span className="text-[13px] text-[var(--text-secondary)] font-['JetBrains_Mono'] tabular-nums">{r.next30DaysForecast}</span>
                         </td>
-                        <td className="px-4 py-2.5 text-right">
+                        <td className="px-4 py-3 text-right">
                           {r.isReorderNeeded ? (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-sm text-[10px] font-semibold bg-[#f59e0b10] border border-[#f59e0b30] text-[#f59e0b] tabular-nums">
+                            <span className="badge badge-amber font-['JetBrains_Mono'] tabular-nums">
                               + {r.recommendedQty} Units
                             </span>
                           ) : (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-sm text-[10px] font-semibold bg-[#10b98110] border border-[#10b98130] text-[#10b981]">
+                            <span className="badge badge-green">
                               Optimal
                             </span>
                           )}

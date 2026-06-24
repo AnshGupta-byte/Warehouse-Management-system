@@ -7,16 +7,16 @@ async function main() {
   console.log('[Seed] Starting database seed...');
 
   // 1. Clear database
-  await prisma.alert.deleteMany();
-  await prisma.forecastResult.deleteMany();
-  await prisma.orderItem.deleteMany();
-  await prisma.order.deleteMany();
-  await prisma.stockMovement.deleteMany();
-  await prisma.stockLevel.deleteMany();
-  await prisma.product.deleteMany();
-  await prisma.category.deleteMany();
-  await prisma.warehouse.deleteMany();
-  await prisma.user.deleteMany();
+  // await prisma.alert.deleteMany();
+  // await prisma.forecastResult.deleteMany();
+  // await prisma.orderItem.deleteMany();
+  // await prisma.order.deleteMany();
+  // await prisma.stockMovement.deleteMany();
+  // await prisma.stockLevel.deleteMany();
+  // await prisma.product.deleteMany();
+  // await prisma.category.deleteMany();
+  // await prisma.warehouse.deleteMany();
+  // await prisma.user.deleteMany();
 
   console.log('[Seed] Cleared existing tables.');
 
@@ -26,13 +26,14 @@ async function main() {
   const managerPassword = await bcrypt.hash('manager123', salt);
   const staffPassword = await bcrypt.hash('staff123', salt);
 
-  await prisma.user.createMany({
-    data: [
-      { email: 'admin@warehouse.com', name: 'System Admin', password: adminPassword, role: 'ADMIN' },
-      { email: 'manager@warehouse.com', name: 'Warehouse Manager', password: managerPassword, role: 'MANAGER' },
-      { email: 'staff@warehouse.com', name: 'Floor Staff', password: staffPassword, role: 'STAFF' },
-    ],
-  });
+  const userData = [
+    { email: 'admin@warehouse.com', name: 'System Admin', password: adminPassword, role: 'ADMIN' },
+    { email: 'manager@warehouse.com', name: 'Warehouse Manager', password: managerPassword, role: 'MANAGER' },
+    { email: 'staff@warehouse.com', name: 'Floor Staff', password: staffPassword, role: 'STAFF' },
+  ];
+  for (const u of userData) {
+    await prisma.user.create({ data: u });
+  }
   console.log('[Seed] Created users (Admin, Manager, Staff).');
 
   // 3. Create Warehouses

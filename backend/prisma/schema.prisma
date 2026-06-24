@@ -3,12 +3,12 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id        String   @id @default(cuid())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   email     String   @unique
   name      String
   password  String
@@ -18,14 +18,14 @@ model User {
 }
 
 model Category {
-  id       String    @id @default(cuid())
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
   name     String    @unique
   color    String    @default("#3b82f6")
   products Product[]
 }
 
 model Warehouse {
-  id             String          @id @default(cuid())
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
   name           String
   location       String
   capacity       Int
@@ -37,11 +37,11 @@ model Warehouse {
 }
 
 model Product {
-  id             String          @id @default(cuid())
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
   sku            String          @unique
   name           String
   description    String?
-  categoryId     String
+  categoryId     String          @db.ObjectId
   category       Category        @relation(fields: [categoryId], references: [id])
   unit           String          @default("units")
   unitPrice      Float
@@ -60,10 +60,10 @@ model Product {
 }
 
 model StockLevel {
-  id          String    @id @default(cuid())
-  productId   String
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  productId   String    @db.ObjectId
   product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
-  warehouseId String
+  warehouseId String    @db.ObjectId
   warehouse   Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
   quantity    Int       @default(0)
   aisle       String?   // Aisle code e.g. "A", "B"
@@ -75,10 +75,10 @@ model StockLevel {
 }
 
 model StockMovement {
-  id          String    @id @default(cuid())
-  productId   String
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  productId   String    @db.ObjectId
   product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
-  warehouseId String
+  warehouseId String    @db.ObjectId
   warehouse   Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
   type        String    // IN, OUT, ADJUSTMENT
   quantity    Int
@@ -89,7 +89,7 @@ model StockMovement {
 }
 
 model Order {
-  id          String      @id @default(cuid())
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
   orderNumber String      @unique
   type        String      // PURCHASE, SALES
   status      String      @default("PENDING") // PENDING, CONFIRMED, SHIPPED, DELIVERED, CANCELLED
@@ -106,10 +106,10 @@ model Order {
 }
 
 model OrderItem {
-  id        String  @id @default(cuid())
-  orderId   String
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  orderId   String  @db.ObjectId
   order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productId String
+  productId String  @db.ObjectId
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   quantity  Int
   unitPrice Float
@@ -117,8 +117,8 @@ model OrderItem {
 }
 
 model ForecastResult {
-  id           String   @id @default(cuid())
-  productId    String
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  productId    String   @db.ObjectId
   product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   forecastDate DateTime
   predictedQty Float
@@ -127,10 +127,10 @@ model ForecastResult {
 }
 
 model Alert {
-  id          String     @id @default(cuid())
-  productId   String?
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  productId   String?    @db.ObjectId
   product     Product?   @relation(fields: [productId], references: [id], onDelete: SetNull)
-  warehouseId String?
+  warehouseId String?    @db.ObjectId
   warehouse   Warehouse? @relation(fields: [warehouseId], references: [id], onDelete: SetNull)
   type        String     // LOW_STOCK, OVERSTOCK, DEMAND_SPIKE, STOCKOUT_RISK
   severity    String     // CRITICAL, WARNING, INFO

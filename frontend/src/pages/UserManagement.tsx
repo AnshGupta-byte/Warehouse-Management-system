@@ -16,15 +16,21 @@ interface User {
 }
 
 const ROLE_COLORS: Record<string, string> = {
-  ADMIN: 'bg-red-500/10 text-red-400 border-red-500/20',
-  MANAGER: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-  STAFF: 'bg-[#1e2d45]/60 text-[#3b82f6] border-[#243552]',
+  ADMIN: 'bg-red-500/10 text-[var(--danger)]',
+  MANAGER: 'bg-amber-500/10 text-[var(--warning)]',
+  STAFF: 'bg-[rgba(37,99,235,0.08)] text-[var(--accent)]',
 };
 
 const ROLE_ICONS: Record<string, string> = {
   ADMIN: '👑',
   MANAGER: '🎯',
   STAFF: '👤',
+};
+
+const AVATAR_COLORS: Record<string, string> = {
+  ADMIN: 'bg-red-500/10 text-[var(--danger)] border-red-500/20',
+  MANAGER: 'bg-amber-500/10 text-[var(--warning)] border-amber-500/20',
+  STAFF: 'bg-[rgba(37,99,235,0.08)] text-[var(--accent)] border-[var(--accent-light)]/20',
 };
 
 interface UserModalProps {
@@ -71,60 +77,62 @@ const UserModal: React.FC<UserModalProps> = ({ user, onClose, onSave }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-      <div className="bg-[#0b1120] border border-[#1e2d45] rounded-md w-full max-w-sm shadow-md">
+    <div className="modal-overlay fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+      <div className="modal bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl w-full max-w-sm shadow-xl animate-in fade-in zoom-in-95 duration-200">
         {/* Modal header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[#1e2d45]">
-          <div className="flex items-center space-x-2">
-            <UserPlus className="h-3.5 w-3.5 text-[#3b82f6]" />
-            <span className="text-xs font-semibold text-white">{user ? 'Edit User' : 'Add User'}</span>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)]">
+          <div className="flex items-center space-x-2.5">
+            <div className="h-7 w-7 rounded-lg bg-[rgba(37,99,235,0.08)] flex items-center justify-center">
+              <UserPlus className="h-4 w-4 text-[var(--accent)]" />
+            </div>
+            <span className="text-sm font-semibold text-[var(--text-primary)]">{user ? 'Edit User' : 'Add User'}</span>
           </div>
-          <button onClick={onClose} className="p-1 rounded-sm hover:bg-[#0f1729] text-[#4a5f7a] hover:text-[#94a3b8] transition-colors">
-            <X className="h-3.5 w-3.5" />
+          <button onClick={onClose} className="btn-ghost p-1.5 rounded-lg hover:bg-[var(--bg-hover)] text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors">
+            <X className="h-4 w-4" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-4 space-y-3">
+        <form onSubmit={handleSubmit} className="p-5 space-y-4">
           {error && (
-            <div className="flex items-center space-x-2 bg-red-500/5 border border-red-500/20 rounded-md p-2.5 text-[11px] text-red-400">
-              <AlertTriangle className="h-3.5 w-3.5 flex-shrink-0" />
+            <div className="flex items-center space-x-2 bg-[rgba(239,68,68,0.08)] border border-red-500/20 rounded-lg p-3 text-[13px] text-[var(--danger)]">
+              <AlertTriangle className="h-4 w-4 flex-shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
           {/* Name */}
           <div>
-            <label className="block text-[10px] font-semibold text-[#4a5f7a] mb-1.5 uppercase tracking-widest">Full Name</label>
+            <label className="block text-xs font-medium text-[var(--text-muted)] mb-1.5 uppercase tracking-wide">Full Name</label>
             <input
               type="text"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               required
               placeholder="John Doe"
-              className="w-full bg-[#0f1729] border border-[#1e2d45] rounded-md px-3 py-2 text-[12px] text-white placeholder-[#4a5f7a] focus:outline-none focus:border-[#243552] transition-colors"
+              className="w-full h-10 bg-[var(--bg-elevated)] border border-[var(--border)] rounded-lg px-3 py-2 text-[13px] text-[var(--text-primary)] placeholder-[#52525b] focus:outline-none focus:ring-2 focus:ring-[#2563eb]/40 focus:border-[var(--accent)] transition-colors"
             />
           </div>
 
           {/* Email */}
           <div>
-            <label className="block text-[10px] font-semibold text-[#4a5f7a] mb-1.5 uppercase tracking-widest">Email Address</label>
+            <label className="block text-xs font-medium text-[var(--text-muted)] mb-1.5 uppercase tracking-wide">Email Address</label>
             <input
               type="email"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
               required
               placeholder="john@company.com"
-              className="w-full bg-[#0f1729] border border-[#1e2d45] rounded-md px-3 py-2 text-[12px] text-white placeholder-[#4a5f7a] focus:outline-none focus:border-[#243552] transition-colors"
+              className="w-full h-10 bg-[var(--bg-elevated)] border border-[var(--border)] rounded-lg px-3 py-2 text-[13px] text-[var(--text-primary)] placeholder-[#52525b] focus:outline-none focus:ring-2 focus:ring-[#2563eb]/40 focus:border-[var(--accent)] transition-colors"
             />
           </div>
 
           {/* Role */}
           <div>
-            <label className="block text-[10px] font-semibold text-[#4a5f7a] mb-1.5 uppercase tracking-widest">Role</label>
+            <label className="block text-xs font-medium text-[var(--text-muted)] mb-1.5 uppercase tracking-wide">Role</label>
             <select
               value={form.role}
               onChange={(e) => setForm({ ...form, role: e.target.value as any })}
-              className="w-full bg-[#0f1729] border border-[#1e2d45] rounded-md px-3 py-2 text-[12px] text-white focus:outline-none focus:border-[#243552] transition-colors"
+              className="w-full h-10 bg-[var(--bg-elevated)] border border-[var(--border)] rounded-lg px-3 py-2 text-[13px] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[#2563eb]/40 focus:border-[var(--accent)] transition-colors"
             >
               <option value="STAFF">Staff</option>
               <option value="MANAGER">Manager</option>
@@ -134,8 +142,8 @@ const UserModal: React.FC<UserModalProps> = ({ user, onClose, onSave }) => {
 
           {/* Password */}
           <div>
-            <label className="block text-[10px] font-semibold text-[#4a5f7a] mb-1.5 uppercase tracking-widest">
-              Password {user && <span className="text-[#4a5f7a] normal-case font-normal">(leave blank to keep current)</span>}
+            <label className="block text-xs font-medium text-[var(--text-muted)] mb-1.5 uppercase tracking-wide">
+              Password {user && <span className="text-[var(--text-muted)] normal-case font-normal">(leave blank to keep current)</span>}
             </label>
             <div className="relative">
               <input
@@ -143,10 +151,10 @@ const UserModal: React.FC<UserModalProps> = ({ user, onClose, onSave }) => {
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
                 placeholder={user ? 'New password (optional)' : 'Min 8 characters'}
-                className="w-full bg-[#0f1729] border border-[#1e2d45] rounded-md px-3 py-2 pr-9 text-[12px] text-white placeholder-[#4a5f7a] focus:outline-none focus:border-[#243552] transition-colors"
+                className="w-full h-10 bg-[var(--bg-elevated)] border border-[var(--border)] rounded-lg px-3 py-2 pr-9 text-[13px] text-[var(--text-primary)] placeholder-[#52525b] focus:outline-none focus:ring-2 focus:ring-[#2563eb]/40 focus:border-[var(--accent)] transition-colors"
               />
-              <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-2.5 top-2 text-[#4a5f7a] hover:text-[#94a3b8]">
-                {showPass ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+              <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors">
+                {showPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
           </div>
@@ -154,18 +162,18 @@ const UserModal: React.FC<UserModalProps> = ({ user, onClose, onSave }) => {
           {/* Confirm Password */}
           {form.password && (
             <div>
-              <label className="block text-[10px] font-semibold text-[#4a5f7a] mb-1.5 uppercase tracking-widest">Confirm Password</label>
+              <label className="block text-xs font-medium text-[var(--text-muted)] mb-1.5 uppercase tracking-wide">Confirm Password</label>
               <div className="relative">
                 <input
                   type={showPass ? 'text' : 'password'}
                   value={form.confirmPassword}
                   onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
                   placeholder="Repeat password"
-                  className="w-full bg-[#0f1729] border border-[#1e2d45] rounded-md px-3 py-2 pr-9 text-[12px] text-white placeholder-[#4a5f7a] focus:outline-none focus:border-[#243552] transition-colors"
+                  className="w-full h-10 bg-[var(--bg-elevated)] border border-[var(--border)] rounded-lg px-3 py-2 pr-9 text-[13px] text-[var(--text-primary)] placeholder-[#52525b] focus:outline-none focus:ring-2 focus:ring-[#2563eb]/40 focus:border-[var(--accent)] transition-colors"
                 />
                 {form.confirmPassword && (
-                  <span className={`absolute right-2.5 top-2 ${form.password === form.confirmPassword ? 'text-[#10b981]' : 'text-red-400'}`}>
-                    {form.password === form.confirmPassword ? <Check className="h-3.5 w-3.5" /> : <X className="h-3.5 w-3.5" />}
+                  <span className={`absolute right-3 top-1/2 -translate-y-1/2 ${form.password === form.confirmPassword ? 'text-[var(--success)]' : 'text-[var(--danger)]'}`}>
+                    {form.password === form.confirmPassword ? <Check className="h-4 w-4" /> : <X className="h-4 w-4" />}
                   </span>
                 )}
               </div>
@@ -173,21 +181,21 @@ const UserModal: React.FC<UserModalProps> = ({ user, onClose, onSave }) => {
           )}
 
           {/* Actions */}
-          <div className="flex space-x-2 pt-1">
+          <div className="flex space-x-2 pt-2">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-3 py-2 rounded-md border border-[#1e2d45] text-[11px] font-medium text-[#94a3b8] hover:border-[#243552] hover:text-white transition-colors"
+              className="btn-secondary flex-1 px-3 py-2.5 rounded-lg border border-[var(--border)] text-[13px] font-medium text-[var(--text-secondary)] hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-3 py-2 rounded-md bg-[#3b82f6] hover:bg-[#2563eb] text-[11px] font-medium text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="btn-primary flex-1 px-3 py-2.5 rounded-lg bg-[var(--accent)] hover:bg-[#3b82f6] text-[13px] font-medium text-white shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
             >
               {loading
-                ? <div className="h-3.5 w-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ? <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 : user ? 'Save Changes' : 'Create User'}
             </button>
           </div>
@@ -257,34 +265,34 @@ export const UserManagement: React.FC = () => {
     <div className="space-y-0">
       {/* Toast */}
       {toast && (
-        <div className={`fixed top-4 right-4 z-50 flex items-center space-x-2 px-4 py-2.5 rounded-md border text-[11px] font-medium shadow-md ${
+        <div className={`fixed top-4 right-4 z-50 flex items-center space-x-2 px-4 py-3 rounded-lg text-[13px] font-medium shadow-lg ${
           toast.type === 'success'
-            ? 'bg-[#0b1120] border-[#10b981]/30 text-[#10b981]'
-            : 'bg-[#0b1120] border-red-500/30 text-red-400'
+            ? 'bg-[var(--bg-elevated)] border border-[#10b981]/30 text-[var(--success)]'
+            : 'bg-[var(--bg-elevated)] border border-red-500/30 text-[var(--danger)]'
         }`}>
-          {toast.type === 'success' ? <Check className="h-3.5 w-3.5" /> : <AlertTriangle className="h-3.5 w-3.5" />}
+          {toast.type === 'success' ? <Check className="h-4 w-4" /> : <AlertTriangle className="h-4 w-4" />}
           <span>{toast.message}</span>
         </div>
       )}
 
       {/* ── Page Toolbar ─────────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-[#1e2d45] bg-[#0b1120]">
+      <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] bg-[var(--bg-surface)]">
         <div>
-          <h1 className="text-sm font-semibold text-white">User Management</h1>
-          <p className="text-[11px] text-[#4a5f7a] mt-0.5">Manage team members, roles, and access control</p>
+          <h1 className="text-sm font-semibold text-[var(--text-primary)]">User Management</h1>
+          <p className="text-[13px] text-[var(--text-muted)] mt-0.5">Manage team members, roles, and access control</p>
         </div>
         <div className="flex items-center space-x-2">
           <button
             onClick={fetchUsers}
-            className="p-1.5 rounded-md border border-[#1e2d45] hover:border-[#243552] text-[#4a5f7a] hover:text-[#94a3b8] transition-colors"
+            className="btn-ghost p-1.5 rounded-lg border border-[var(--border)] hover:border-[var(--border-strong)] text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
           >
-            <RefreshCw className="h-3.5 w-3.5" />
+            <RefreshCw className="h-4 w-4" />
           </button>
           <button
             onClick={() => { setEditUser(null); setShowModal(true); }}
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-md bg-[#3b82f6] hover:bg-[#2563eb] text-white text-[11px] font-medium transition-colors"
+            className="btn-primary flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-[var(--accent)] hover:bg-[#3b82f6] text-white text-[13px] font-medium shadow-sm transition-colors"
           >
-            <UserPlus className="h-3.5 w-3.5" />
+            <UserPlus className="h-4 w-4" />
             <span>Add User</span>
           </button>
         </div>
@@ -293,44 +301,53 @@ export const UserManagement: React.FC = () => {
       <div className="p-6 space-y-4">
 
         {/* ── KPI Row ──────────────────────────────────────────────────── */}
-        <div className="grid grid-cols-3 divide-x divide-[#1e2d45] border border-[#1e2d45] rounded-md bg-[#0b1120] overflow-hidden">
+        <div className="grid grid-cols-3 gap-4">
           {[
-            { role: 'ADMIN', label: 'Administrators', count: roleCounts.ADMIN, desc: 'Full system access', colorClass: 'text-red-400' },
-            { role: 'MANAGER', label: 'Managers', count: roleCounts.MANAGER, desc: 'Operations access', colorClass: 'text-amber-400' },
-            { role: 'STAFF', label: 'Staff Members', count: roleCounts.STAFF, desc: 'View & basic access', colorClass: 'text-[#3b82f6]' },
+            { role: 'ADMIN', label: 'Administrators', count: roleCounts.ADMIN, desc: 'Full system access', colorClass: 'text-[var(--danger)]', bgClass: 'bg-red-500/10' },
+            { role: 'MANAGER', label: 'Managers', count: roleCounts.MANAGER, desc: 'Operations access', colorClass: 'text-[var(--warning)]', bgClass: 'bg-amber-500/10' },
+            { role: 'STAFF', label: 'Staff Members', count: roleCounts.STAFF, desc: 'View & basic access', colorClass: 'text-[var(--accent)]', bgClass: 'bg-[rgba(37,99,235,0.08)]' },
           ].map((card) => (
             <button
               key={card.role}
               onClick={() => setRoleFilter(roleFilter === card.role ? 'ALL' : card.role)}
-              className={`px-4 py-3 text-left transition-colors hover:bg-[#0f1729] ${roleFilter === card.role ? 'bg-[#0f1729]' : ''}`}
+              className={`panel px-5 py-4 text-left rounded-xl border transition-colors shadow-[0_1px_3px_rgba(0,0,0,0.1)] ${
+                roleFilter === card.role
+                  ? 'bg-[var(--bg-elevated)] border-[var(--border-strong)]'
+                  : 'bg-[var(--bg-surface)] border-[var(--border)] hover:bg-[var(--bg-hover)]'
+              }`}
             >
-              <div className={`text-[10px] font-semibold tracking-widest uppercase mb-1 ${card.colorClass}`}>{card.label}</div>
-              <div className="text-xl font-semibold text-white tabular-nums">{card.count}</div>
-              <div className="text-[10px] text-[#4a5f7a] mt-0.5">{card.desc}</div>
+              <div className="flex items-center space-x-2 mb-2">
+                <div className={`h-7 w-7 rounded-lg ${card.bgClass} flex items-center justify-center`}>
+                  <Shield className={`h-4 w-4 ${card.colorClass}`} />
+                </div>
+                <span className={`text-xs font-medium tracking-wide uppercase ${card.colorClass}`}>{card.label}</span>
+              </div>
+              <div className="text-2xl font-bold text-[var(--text-primary)] tabular-nums font-['JetBrains_Mono']">{card.count}</div>
+              <div className="text-[13px] text-[var(--text-muted)] mt-0.5">{card.desc}</div>
             </button>
           ))}
         </div>
 
         {/* ── Search bar ───────────────────────────────────────────────── */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#4a5f7a]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-muted)]" />
           <input
             type="text"
             placeholder="Search by name or email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-[#0b1120] border border-[#1e2d45] rounded-md pl-9 pr-4 py-2 text-[12px] text-[#cbd5e1] placeholder-[#4a5f7a] focus:outline-none focus:border-[#243552] transition-colors"
+            className="w-full h-10 bg-[var(--bg-surface)] border border-[var(--border)] rounded-lg pl-9 pr-4 py-2 text-[13px] text-[var(--text-primary)] placeholder-[#52525b] focus:outline-none focus:ring-2 focus:ring-[#2563eb]/40 focus:border-[var(--accent)] transition-colors"
           />
         </div>
 
         {/* ── Users Data Table ─────────────────────────────────────────── */}
-        <div className="bg-[#0b1120] border border-[#1e2d45] rounded-md overflow-hidden">
+        <div className="panel bg-[var(--bg-surface)] border border-[var(--border)] rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-[#1e2d45] bg-[#0b1120]">
+                <tr className="border-b border-[var(--border)]">
                   {['Name', 'Email', 'Role', 'Status', 'Joined', 'Actions'].map((h) => (
-                    <th key={h} className={`px-4 py-2.5 text-[10px] font-semibold tracking-widest text-[#4a5f7a] uppercase whitespace-nowrap ${h === 'Actions' ? 'text-right' : 'text-left'}`}>
+                    <th key={h} className={`px-4 py-3 text-xs font-medium tracking-wide text-[var(--text-muted)] uppercase whitespace-nowrap ${h === 'Actions' ? 'text-right' : 'text-left'}`}>
                       {h}
                     </th>
                   ))}
@@ -339,10 +356,10 @@ export const UserManagement: React.FC = () => {
               <tbody>
                 {loading ? (
                   Array.from({ length: 4 }).map((_, i) => (
-                    <tr key={i} className="border-b border-[#1e2d45]/50">
+                    <tr key={i} className="border-b border-[var(--border)]/50">
                       {Array.from({ length: 6 }).map((_, j) => (
                         <td key={j} className="px-4 py-3">
-                          <div className="h-3 bg-[#0f1729] rounded animate-pulse" style={{ width: `${55 + Math.random() * 30}%` }} />
+                          <div className="skeleton h-3 bg-[var(--bg-elevated)] rounded animate-pulse" style={{ width: `${55 + Math.random() * 30}%` }} />
                         </td>
                       ))}
                     </tr>
@@ -350,26 +367,29 @@ export const UserManagement: React.FC = () => {
                 ) : filtered.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="px-4 py-14 text-center">
-                      <Users className="h-8 w-8 text-[#1e2d45] mx-auto mb-2" />
-                      <p className="text-[11px] text-[#4a5f7a]">No users found</p>
+                      <div className="inline-flex items-center justify-center h-12 w-12 rounded-xl bg-[#27272a]/50 mb-3">
+                        <Users className="h-6 w-6 text-[var(--text-muted)]" />
+                      </div>
+                      <p className="text-sm font-medium text-[var(--text-secondary)] mb-1">No users found</p>
+                      <p className="text-[13px] text-[var(--text-muted)]">Try adjusting your search or filters.</p>
                     </td>
                   </tr>
                 ) : (
                   filtered.map((u) => (
                     <tr
                       key={u.id}
-                      className={`border-b border-[#1e2d45]/50 hover:bg-[#0f1729] transition-colors ${u.id === currentUser?.id ? 'bg-[#3b82f6]/5' : ''}`}
+                      className={`border-b border-[var(--border)]/50 hover:bg-[var(--bg-hover)] transition-colors ${u.id === currentUser?.id ? 'bg-[rgba(37,99,235,0.04)]' : ''}`}
                     >
                       {/* Name */}
                       <td className="px-4 py-2.5">
                         <div className="flex items-center space-x-2.5">
-                          <div className="h-6 w-6 rounded-sm bg-[#1e2d45] border border-[#243552] flex items-center justify-center text-white text-[9px] font-semibold flex-shrink-0">
+                          <div className={`h-7 w-7 rounded-lg border flex items-center justify-center text-[10px] font-semibold flex-shrink-0 ${AVATAR_COLORS[u.role]}`}>
                             {getInitials(u.name)}
                           </div>
                           <div className="flex items-center space-x-1.5">
-                            <span className="text-[12px] font-medium text-[#cbd5e1]">{u.name}</span>
+                            <span className="text-[13px] font-medium text-[var(--text-primary)]">{u.name}</span>
                             {u.id === currentUser?.id && (
-                              <span className="text-[9px] bg-[#3b82f6]/10 text-[#3b82f6] border border-[#3b82f6]/20 px-1.5 py-0.5 rounded-sm font-semibold">YOU</span>
+                              <span className="badge badge-blue text-[9px] bg-[rgba(37,99,235,0.08)] text-[var(--accent)] px-1.5 py-0.5 rounded-full font-semibold">YOU</span>
                             )}
                           </div>
                         </div>
@@ -377,26 +397,26 @@ export const UserManagement: React.FC = () => {
 
                       {/* Email */}
                       <td className="px-4 py-2.5">
-                        <span className="text-[11px] text-[#4a5f7a]">{u.email}</span>
+                        <span className="text-[13px] text-[var(--text-muted)]">{u.email}</span>
                       </td>
 
                       {/* Role */}
                       <td className="px-4 py-2.5">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold border ${ROLE_COLORS[u.role]}`}>
+                        <span className={`badge inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${ROLE_COLORS[u.role]}`}>
                           {u.role}
                         </span>
                       </td>
 
                       {/* Status */}
                       <td className="px-4 py-2.5">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold border bg-[#10b981]/10 text-[#10b981] border-[#10b981]/20">
+                        <span className="badge badge-success inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-[rgba(16,185,129,0.08)] text-[var(--success)]">
                           Active
                         </span>
                       </td>
 
                       {/* Joined */}
                       <td className="px-4 py-2.5">
-                        <span className="text-[11px] text-[#4a5f7a]">
+                        <span className="text-[13px] text-[var(--text-muted)]">
                           {new Date(u.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                         </span>
                       </td>
@@ -406,7 +426,7 @@ export const UserManagement: React.FC = () => {
                         <div className="flex items-center justify-end space-x-1">
                           <button
                             onClick={() => { setEditUser(u); setShowModal(true); }}
-                            className="p-1.5 rounded-sm hover:bg-[#1e2d45] text-[#4a5f7a] hover:text-[#3b82f6] transition-colors"
+                            className="btn-ghost p-1.5 rounded-lg hover:bg-[#27272a] text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors"
                             title="Edit user"
                           >
                             <Edit2 className="h-3.5 w-3.5" />
@@ -416,14 +436,14 @@ export const UserManagement: React.FC = () => {
                               <div className="flex items-center space-x-1">
                                 <button
                                   onClick={() => handleDelete(u.id)}
-                                  className="p-1.5 rounded-sm bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors"
+                                  className="p-1.5 rounded-lg bg-[rgba(239,68,68,0.08)] hover:bg-red-500/20 text-[var(--danger)] transition-colors"
                                   title="Confirm delete"
                                 >
                                   <Check className="h-3.5 w-3.5" />
                                 </button>
                                 <button
                                   onClick={() => setDeleteConfirm(null)}
-                                  className="p-1.5 rounded-sm hover:bg-[#1e2d45] text-[#4a5f7a] hover:text-[#94a3b8] transition-colors"
+                                  className="btn-ghost p-1.5 rounded-lg hover:bg-[#27272a] text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
                                   title="Cancel"
                                 >
                                   <X className="h-3.5 w-3.5" />
@@ -432,7 +452,7 @@ export const UserManagement: React.FC = () => {
                             ) : (
                               <button
                                 onClick={() => setDeleteConfirm(u.id)}
-                                className="p-1.5 rounded-sm hover:bg-[#1e2d45] text-[#4a5f7a] hover:text-red-400 transition-colors"
+                                className="btn-ghost p-1.5 rounded-lg hover:bg-[#27272a] text-[var(--text-muted)] hover:text-[var(--danger)] transition-colors"
                                 title="Delete user"
                               >
                                 <Trash2 className="h-3.5 w-3.5" />
@@ -449,7 +469,7 @@ export const UserManagement: React.FC = () => {
           </div>
 
           {!loading && filtered.length > 0 && (
-            <div className="px-4 py-2.5 border-t border-[#1e2d45] text-[10px] text-[#4a5f7a]">
+            <div className="px-4 py-2.5 border-t border-[var(--border)] text-[13px] text-[var(--text-muted)]">
               Showing {filtered.length} of {users.length} users
             </div>
           )}

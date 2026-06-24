@@ -7,8 +7,8 @@ import {
   CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
 import {
-  TrendingUp, AlertTriangle, Boxes, ClipboardCheck,
-  ArrowUpRight, ArrowDownRight, Circle, ExternalLink,
+  TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight,
+  Package, DollarSign, AlertTriangle, Boxes, ExternalLink,
 } from 'lucide-react';
 
 const STATUS_BADGE: Record<string, string> = {
@@ -81,45 +81,61 @@ export const Dashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex h-64 items-center justify-center gap-3">
-        <div className="spinner" /><span className="text-[12px]" style={{ color: '#4a5f7a' }}>Loading...</span>
+      <div className="space-y-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1,2,3,4].map(i => <div key={i} className="h-32 skeleton rounded-xl" />)}
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          <div className="lg:col-span-2 h-80 skeleton rounded-xl" />
+          <div className="h-80 skeleton rounded-xl" />
+        </div>
       </div>
     );
   }
 
   const kpis = [
-    { label: 'TOTAL SKUs', value: stats.totalSKUs, sub: 'Managed products', accentColor: '#3b82f6' },
-    { label: 'STOCK UNITS', value: stats.totalStockUnits.toLocaleString(), sub: 'Across all locations', accentColor: '#10b981' },
-    { label: 'INVENTORY VALUE', value: `$${stats.valuation.toLocaleString()}`, sub: 'Total asset value', accentColor: '#7c3aed' },
-    { label: 'ACTIVE ALERTS', value: stats.activeAlerts, sub: stats.activeAlerts > 0 ? 'Requires attention' : 'All systems nominal', accentColor: stats.activeAlerts > 0 ? '#ef4444' : '#1e2d45' },
+    {
+      label: 'Total SKUs', value: stats.totalSKUs, trend: '+3 this month', trendType: 'up' as const,
+      icon: Package, iconColor: '#3b82f6', iconBg: 'rgba(37,99,235,0.1)',
+    },
+    {
+      label: 'Stock Volume', value: stats.totalStockUnits.toLocaleString(), trend: 'Across all locations', trendType: 'neutral' as const,
+      icon: Boxes, iconColor: '#10b981', iconBg: 'rgba(16,185,129,0.1)',
+    },
+    {
+      label: 'Inventory Value', value: `$${stats.valuation.toLocaleString()}`, trend: '+12% vs last month', trendType: 'up' as const,
+      icon: DollarSign, iconColor: '#a78bfa', iconBg: 'rgba(124,58,237,0.1)',
+    },
+    {
+      label: 'Active Alerts', value: stats.activeAlerts,
+      trend: stats.activeAlerts > 0 ? 'Needs attention' : 'All systems nominal',
+      trendType: stats.activeAlerts > 0 ? 'down' as const : 'neutral' as const,
+      icon: AlertTriangle, iconColor: stats.activeAlerts > 0 ? '#f87171' : '#a1a1aa',
+      iconBg: stats.activeAlerts > 0 ? 'rgba(239,68,68,0.1)' : 'rgba(113,113,122,0.1)',
+    },
   ];
 
   return (
-    <div className="space-y-5 fade-in">
-      {/* ── Header ──────────────────────────────────── */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-[14px] font-semibold text-white">Operations Overview</h1>
-          <p className="text-[11px] mt-0.5" style={{ color: '#4a5f7a' }}>
-            {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-          </p>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <Circle className="h-2 w-2 fill-emerald-400 text-emerald-400" style={{ animation: 'pulse 2s infinite' }} />
-          <span className="badge badge-green text-[9px]">LIVE</span>
-        </div>
-      </div>
-
+    <div className="space-y-6 slide-up">
       {/* ── KPIs ────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {kpis.map((k) => (
-          <div key={k.label} className="kpi-card" style={{ '--kpi-accent': k.accentColor } as any}>
-            <style>{`.kpi-card:nth-child(${kpis.indexOf(k) + 1})::before { background: linear-gradient(90deg, ${k.accentColor}, transparent); }`}</style>
-            <div className="kpi-label">{k.label}</div>
-            <div className="kpi-value">{k.value}</div>
-            <div className="kpi-trend" style={{ color: '#4a5f7a' }}>{k.sub}</div>
-          </div>
-        ))}
+        {kpis.map((k) => {
+          const Icon = k.icon;
+          return (
+            <div key={k.label} className="kpi-card">
+              <div className="kpi-icon" style={{ background: k.iconBg }}>
+                <Icon className="h-5 w-5" style={{ color: k.iconColor }} />
+              </div>
+              <div className="kpi-value">{k.value}</div>
+              <div className="kpi-label">{k.label}</div>
+              <div className={`kpi-trend ${k.trendType}`}>
+                {k.trendType === 'up' && <TrendingUp className="h-3 w-3" />}
+                {k.trendType === 'down' && <TrendingDown className="h-3 w-3" />}
+                {k.trend}
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* ── Main grid ───────────────────────────────── */}
@@ -128,52 +144,69 @@ export const Dashboard: React.FC = () => {
         <div className="lg:col-span-2 panel">
           <div className="panel-header">
             <span className="panel-title">Inventory vs Reorder Levels</span>
-            <div className="flex items-center gap-4 text-[10px]" style={{ color: '#4a5f7a' }}>
-              <span className="flex items-center gap-1.5"><span className="inline-block h-2 w-2 rounded-sm" style={{ background: '#3b82f6' }} />Stock</span>
-              <span className="flex items-center gap-1.5"><span className="inline-block h-2 w-2 rounded-sm" style={{ background: '#f59e0b' }} />Reorder</span>
+            <div className="flex items-center gap-5 text-[12px]" style={{ color: '#52525b' }}>
+              <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded" style={{ background: '#2563eb' }} />Current Stock</span>
+              <span className="flex items-center gap-2"><span className="h-2.5 w-2.5 rounded" style={{ background: '#f59e0b', opacity: 0.7 }} />Reorder Point</span>
             </div>
           </div>
-          <div className="p-4 h-64">
+          <div className="p-5" style={{ height: 280 }}>
             <ResponsiveContainer width="100%" height="100%">
-              <RechartsBarChart data={chartData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }} barSize={14} barGap={2}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e2d45" vertical={false} />
-                <XAxis dataKey="name" stroke="#2d4060" fontSize={9} tickLine={false} axisLine={false} />
-                <YAxis stroke="#2d4060" fontSize={9} tickLine={false} axisLine={false} />
-                <Tooltip contentStyle={{ background: '#0b1120', border: '1px solid #1e2d45', borderRadius: 4, fontSize: 11 }} labelStyle={{ color: '#cbd5e1', fontWeight: 600 }} cursor={{ fill: '#1e2d4510' }} />
-                <Bar dataKey="Stock" fill="#3b82f6" radius={[2, 2, 0, 0]} />
-                <Bar dataKey="ReorderPoint" fill="#f59e0b" radius={[2, 2, 0, 0]} opacity={0.7} />
+              <RechartsBarChart data={chartData} margin={{ top: 8, right: 8, left: -16, bottom: 0 }} barSize={16} barGap={3}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
+                <XAxis dataKey="name" stroke="#3f3f46" fontSize={11} tickLine={false} axisLine={false} />
+                <YAxis stroke="#3f3f46" fontSize={11} tickLine={false} axisLine={false} />
+                <Tooltip
+                  contentStyle={{ background: '#18181b', border: '1px solid #27272a', borderRadius: 8, fontSize: 12 }}
+                  labelStyle={{ color: '#fafafa', fontWeight: 600, marginBottom: 4 }}
+                  cursor={{ fill: 'rgba(39,39,42,0.3)' }}
+                />
+                <Bar dataKey="Stock" fill="#2563eb" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="ReorderPoint" fill="#f59e0b" radius={[4, 4, 0, 0]} opacity={0.7} />
               </RechartsBarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* Low stock watchlist */}
-        <div className="panel">
+        <div className="panel flex flex-col">
           <div className="panel-header">
             <span className="panel-title">Low Stock Watchlist</span>
-            <span className="badge badge-amber">{lowStockItems.length} items</span>
+            <span className="badge badge-amber">{lowStockItems.length}</span>
           </div>
-          {lowStockItems.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="text-[12px] font-medium mb-1" style={{ color: '#4a5f7a' }}>All stock levels healthy</div>
-              <div className="text-[11px]" style={{ color: '#2d4060' }}>No items below reorder point</div>
-            </div>
-          ) : (
-            <div className="divide-y" style={{ borderColor: '#111e35' }}>
-              {lowStockItems.map((item) => (
-                <div key={item.id} className="flex items-center justify-between px-4 py-2.5 transition-all" style={{ cursor: 'default' }} onMouseEnter={e => (e.currentTarget.style.background = '#0f1729')} onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
-                  <div className="min-w-0 flex-1">
-                    <div className="text-[12px] font-medium truncate" style={{ color: '#cbd5e1' }}>{item.name}</div>
-                    <div className="mono text-[10px] mt-0.5" style={{ color: '#4a5f7a' }}>{item.sku} · min {item.reorderPoint}</div>
-                  </div>
-                  <span className="badge badge-red ml-3 flex-shrink-0">{item.quantity} left</span>
+          <div className="flex-1 overflow-y-auto">
+            {lowStockItems.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-14 text-center px-4">
+                <div className="h-12 w-12 rounded-xl flex items-center justify-center mb-3" style={{ background: '#18181b' }}>
+                  <Package className="h-5 w-5" style={{ color: '#3f3f46' }} />
                 </div>
-              ))}
-            </div>
-          )}
+                <div className="text-[14px] font-medium text-[var(--text-secondary)] mb-1">All stock healthy</div>
+                <div className="text-[12px]" style={{ color: '#52525b' }}>No items below reorder point</div>
+              </div>
+            ) : (
+              <div>
+                {lowStockItems.map((item) => {
+                  const pct = Math.round((item.quantity / Math.max(item.reorderPoint, 1)) * 100);
+                  return (
+                    <div key={item.id} className="px-4 py-3 hover:bg-[var(--bg-hover)] transition-colors" style={{ borderBottom: '1px solid #1c1c1f' }}>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="min-w-0 flex-1 mr-3">
+                          <div className="text-[13px] font-medium truncate text-[var(--text-primary)]">{item.name}</div>
+                          <div className="mono text-[11px] mt-0.5" style={{ color: '#52525b' }}>{item.sku}</div>
+                        </div>
+                        <span className="badge badge-red flex-shrink-0">{item.quantity} left</span>
+                      </div>
+                      <div className="progress-bar">
+                        <div className="fill" style={{ width: `${Math.min(pct, 100)}%`, background: pct < 50 ? '#ef4444' : '#f59e0b' }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
           {lowStockItems.length > 0 && (
-            <div className="px-4 py-2.5" style={{ borderTop: '1px solid #1e2d45' }}>
-              <Link to="/forecasting" className="flex items-center gap-1.5 text-[11px] font-medium" style={{ color: '#60a5fa' }}>
+            <div className="px-4 py-3 flex-shrink-0" style={{ borderTop: '1px solid #27272a' }}>
+              <Link to="/forecasting" className="flex items-center gap-1.5 text-[12px] font-medium text-[var(--accent)] hover:text-[var(--accent-light)] transition-colors">
                 <TrendingUp className="h-3.5 w-3.5" /> Generate reorder recommendations
               </Link>
             </div>
@@ -187,12 +220,12 @@ export const Dashboard: React.FC = () => {
         <div className="panel">
           <div className="panel-header">
             <span className="panel-title">Recent Orders</span>
-            <Link to="/orders" className="flex items-center gap-1 text-[11px]" style={{ color: '#60a5fa' }}>
-              View all <ExternalLink className="h-3 w-3" />
+            <Link to="/orders" className="flex items-center gap-1.5 text-[12px] font-medium text-[var(--accent)] hover:text-[var(--accent-light)] transition-colors">
+              View all <ExternalLink className="h-3.5 w-3.5" />
             </Link>
           </div>
           {recentOrders.length === 0 ? (
-            <div className="py-8 text-center text-[12px]" style={{ color: '#4a5f7a' }}>No recent orders</div>
+            <div className="py-12 text-center text-[13px]" style={{ color: '#52525b' }}>No recent orders</div>
           ) : (
             <table>
               <thead>
@@ -200,18 +233,18 @@ export const Dashboard: React.FC = () => {
                   <th>Order #</th>
                   <th>Type</th>
                   <th>Partner</th>
-                  <th className="text-right">Amount</th>
-                  <th className="text-right">Status</th>
+                  <th style={{ textAlign: 'right' }}>Amount</th>
+                  <th style={{ textAlign: 'right' }}>Status</th>
                 </tr>
               </thead>
               <tbody>
                 {recentOrders.map((order: any) => (
                   <tr key={order.id}>
-                    <td><span className="mono" style={{ color: '#60a5fa' }}>{order.orderNumber}</span></td>
+                    <td><span className="mono font-medium" style={{ color: '#3b82f6' }}>{order.orderNumber}</span></td>
                     <td><span className={order.type === 'PURCHASE' ? 'badge badge-blue' : 'badge badge-purple'}>{order.type === 'PURCHASE' ? 'PO' : 'SO'}</span></td>
-                    <td style={{ color: '#cbd5e1', maxWidth: 120 }}><span className="truncate block">{order.type === 'PURCHASE' ? order.supplier : order.customer}</span></td>
-                    <td className="text-right font-mono font-semibold text-white text-[11px]">${order.totalAmount.toLocaleString()}</td>
-                    <td className="text-right"><span className={STATUS_BADGE[order.status] || 'badge badge-gray'}>{order.status}</span></td>
+                    <td className="text-[var(--text-primary)]" style={{ maxWidth: 140 }}><span className="truncate block">{order.type === 'PURCHASE' ? order.supplier : order.customer}</span></td>
+                    <td style={{ textAlign: 'right' }}><span className="mono font-semibold text-[var(--text-primary)]">${order.totalAmount.toLocaleString()}</span></td>
+                    <td style={{ textAlign: 'right' }}><span className={STATUS_BADGE[order.status] || 'badge badge-gray'}>{order.status}</span></td>
                   </tr>
                 ))}
               </tbody>
@@ -223,10 +256,13 @@ export const Dashboard: React.FC = () => {
         <div className="panel">
           <div className="panel-header">
             <span className="panel-title">Stock Movements</span>
-            <div className="flex items-center gap-1.5"><Circle className="h-2 w-2 fill-emerald-400 text-emerald-400" /><span className="text-[10px]" style={{ color: '#4a5f7a' }}>Live</span></div>
+            <div className="flex items-center gap-2">
+              <span className="status-dot online" />
+              <span className="text-[12px]" style={{ color: '#52525b' }}>Live</span>
+            </div>
           </div>
           {recentMovements.length === 0 ? (
-            <div className="py-8 text-center text-[12px]" style={{ color: '#4a5f7a' }}>No recent movements</div>
+            <div className="py-12 text-center text-[13px]" style={{ color: '#52525b' }}>No recent movements</div>
           ) : (
             <table>
               <thead>
@@ -235,18 +271,18 @@ export const Dashboard: React.FC = () => {
                   <th>Product</th>
                   <th>SKU</th>
                   <th>Ref</th>
-                  <th className="text-right">Qty</th>
+                  <th style={{ textAlign: 'right' }}>Qty</th>
                 </tr>
               </thead>
               <tbody>
                 {recentMovements.map((move: any) => (
                   <tr key={move.id}>
-                    <td style={{ color: '#2d4060', whiteSpace: 'nowrap' }}>{new Date(move.date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</td>
-                    <td style={{ color: '#cbd5e1', maxWidth: 120 }}><span className="truncate block">{move.name}</span></td>
-                    <td><span className="mono">{move.sku}</span></td>
-                    <td style={{ color: '#4a5f7a' }}>{move.reason}</td>
-                    <td className="text-right">
-                      <span className="flex items-center justify-end gap-1 font-mono font-semibold text-[11px]" style={{ color: move.type === 'IN' ? '#10b981' : '#ef4444' }}>
+                    <td style={{ color: '#52525b', whiteSpace: 'nowrap' }}>{new Date(move.date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</td>
+                    <td className="text-[var(--text-primary)]" style={{ maxWidth: 140 }}><span className="truncate block">{move.name}</span></td>
+                    <td><span className="mono" style={{ color: '#a1a1aa' }}>{move.sku}</span></td>
+                    <td style={{ color: '#52525b' }}>{move.reason}</td>
+                    <td style={{ textAlign: 'right' }}>
+                      <span className="flex items-center justify-end gap-1 mono font-semibold text-[12px]" style={{ color: move.type === 'IN' ? '#10b981' : '#ef4444' }}>
                         {move.type === 'IN' ? <ArrowUpRight className="h-3.5 w-3.5" /> : <ArrowDownRight className="h-3.5 w-3.5" />}
                         {move.type === 'IN' ? '+' : '-'}{move.quantity}
                       </span>
