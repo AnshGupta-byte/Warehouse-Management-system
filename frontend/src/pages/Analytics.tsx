@@ -240,7 +240,7 @@ export const Analytics: React.FC = () => {
                 <span className="panel-title text-xs font-semibold tracking-wide text-[var(--text-muted)] uppercase">ABC Classification</span>
                 {abcSummary && (
                   <span className="text-[13px] text-[var(--text-muted)]">
-                    {abcSummary.totalProducts} products · ₹{abcSummary.totalStockValue.toLocaleString('en-US', { maximumFractionDigits: 0 })} total value
+                    {abcSummary.totalProducts} products · ${abcSummary.totalStockValue.toLocaleString('en-US', { maximumFractionDigits: 0 })} total value
                   </span>
                 )}
               </div>
@@ -299,7 +299,7 @@ export const Analytics: React.FC = () => {
                 ))}
                 <div className="px-4 py-3 text-left">
                   <div className="text-xs font-medium tracking-wide uppercase mb-1 text-[var(--text-muted)]">Total Stock Value</div>
-                  <div className="text-xl font-semibold text-[var(--text-primary)] tabular-nums font-['JetBrains_Mono']">₹{abcSummary.totalStockValue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</div>
+                  <div className="text-xl font-semibold text-[var(--text-primary)] tabular-nums font-['JetBrains_Mono']">${abcSummary.totalStockValue.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</div>
                   <div className="text-[13px] text-[var(--text-muted)] mt-0.5">{abcSummary.totalProducts} products</div>
                 </div>
               </div>
@@ -337,7 +337,7 @@ export const Analytics: React.FC = () => {
                         <td className="px-4 py-2.5 text-[13px] font-medium text-[var(--text-primary)] max-w-[180px] truncate">{p.name}</td>
                         <td className="px-4 py-2.5 font-['JetBrains_Mono'] text-[12px] text-[var(--text-muted)]">{p.sku}</td>
                         <td className="px-4 py-2.5 text-[13px] text-[var(--text-secondary)]">{p.category}</td>
-                        <td className="px-4 py-2.5 text-[13px] text-[var(--text-primary)] tabular-nums font-['JetBrains_Mono']">₹{p.annualUsageValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                        <td className="px-4 py-2.5 text-[13px] text-[var(--text-primary)] tabular-nums font-['JetBrains_Mono']">${p.annualUsageValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                         <td className="px-4 py-2.5">
                           <span className={`badge inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${ABC_COLORS[p.abcClass].bg} ${ABC_COLORS[p.abcClass].text}`}>
                             {p.abcClass}

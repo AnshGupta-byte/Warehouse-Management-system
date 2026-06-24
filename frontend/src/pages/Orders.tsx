@@ -361,7 +361,7 @@ export const Orders: React.FC = () => {
                         {/* TOTAL */}
                         <td>
                           <div className="font-semibold text-lg text-[var(--text-primary)] tabular-nums font-['JetBrains_Mono']">
-                            ₹{order.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            ${order.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </div>
                         </td>
 
@@ -418,8 +418,8 @@ export const Orders: React.FC = () => {
                                       <td className="text-[var(--text-primary)]">{item.product.name}</td>
                                       <td><span className="mono text-[var(--text-muted)]">{item.product.sku}</span></td>
                                       <td className="text-right tabular-nums">{item.quantity}</td>
-                                      <td className="text-right tabular-nums font-['JetBrains_Mono']">₹{item.unitPrice.toFixed(2)}</td>
-                                      <td className="text-right tabular-nums font-['JetBrains_Mono'] font-semibold text-[var(--text-primary)]">₹{item.total.toFixed(2)}</td>
+                                      <td className="text-right tabular-nums font-['JetBrains_Mono']">${item.unitPrice.toFixed(2)}</td>
+                                      <td className="text-right tabular-nums font-['JetBrains_Mono'] font-semibold text-[var(--text-primary)]">${item.total.toFixed(2)}</td>
                                     </tr>
                                   ))}
                                 </tbody>
@@ -540,7 +540,7 @@ export const Orders: React.FC = () => {
                             <option value="">Select product…</option>
                             {products.map((p) => (
                               <option key={p.id} value={p.id}>
-                                {p.name} (₹{p.unitPrice})
+                                {p.name} (${p.unitPrice})
                               </option>
                             ))}
                           </select>

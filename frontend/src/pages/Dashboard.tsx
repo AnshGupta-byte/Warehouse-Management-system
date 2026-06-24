@@ -8,7 +8,7 @@ import {
 } from 'recharts';
 import {
   TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight,
-  Package, IndianRupee, AlertTriangle, Boxes, ExternalLink,
+  Package, DollarSign, AlertTriangle, Boxes, ExternalLink,
 } from 'lucide-react';
 
 const STATUS_BADGE: Record<string, string> = {
@@ -103,8 +103,8 @@ export const Dashboard: React.FC = () => {
       icon: Boxes, iconColor: '#10b981', iconBg: 'rgba(16,185,129,0.1)',
     },
     {
-      label: 'Inventory Value', value: `₹${stats.valuation.toLocaleString()}`, trend: '+12% vs last month', trendType: 'up' as const,
-      icon: IndianRupee, iconColor: '#a78bfa', iconBg: 'rgba(124,58,237,0.1)',
+      label: 'Inventory Value', value: `$${stats.valuation.toLocaleString()}`, trend: '+12% vs last month', trendType: 'up' as const,
+      icon: DollarSign, iconColor: '#a78bfa', iconBg: 'rgba(124,58,237,0.1)',
     },
     {
       label: 'Active Alerts', value: stats.activeAlerts,
@@ -243,7 +243,7 @@ export const Dashboard: React.FC = () => {
                     <td><span className="mono font-medium" style={{ color: '#3b82f6' }}>{order.orderNumber}</span></td>
                     <td><span className={order.type === 'PURCHASE' ? 'badge badge-blue' : 'badge badge-purple'}>{order.type === 'PURCHASE' ? 'PO' : 'SO'}</span></td>
                     <td className="text-[var(--text-primary)]" style={{ maxWidth: 140 }}><span className="truncate block">{order.type === 'PURCHASE' ? order.supplier : order.customer}</span></td>
-                    <td style={{ textAlign: 'right' }}><span className="mono font-semibold text-[var(--text-primary)]">₹{order.totalAmount.toLocaleString()}</span></td>
+                    <td style={{ textAlign: 'right' }}><span className="mono font-semibold text-[var(--text-primary)]">${order.totalAmount.toLocaleString()}</span></td>
                     <td style={{ textAlign: 'right' }}><span className={STATUS_BADGE[order.status] || 'badge badge-gray'}>{order.status}</span></td>
                   </tr>
                 ))}
