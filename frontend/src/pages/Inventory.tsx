@@ -735,7 +735,7 @@ export const Inventory: React.FC = () => {
                 {/* Row: Unit Price / Reorder Point */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className={labelCls}>Unit Price ($) <span className="text-[var(--danger)]">*</span></label>
+                    <label className={labelCls}>Unit Price (₹) <span className="text-[var(--danger)]">*</span></label>
                     <input
                       type="number"
                       step="0.01"
