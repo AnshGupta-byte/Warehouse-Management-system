@@ -191,7 +191,7 @@ export const Analytics: React.FC = () => {
 
   // ─── Render ───────────────────────────────────────────────────────────────
   return (
-    <div className="space-y-0" ref={reportRef}>
+    <div className="space-y-0">
 
       {/* ── Page Toolbar ─────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)] bg-[var(--bg-surface)]">
@@ -229,7 +229,7 @@ export const Analytics: React.FC = () => {
       </div>
 
       {/* ── Tab Content ──────────────────────────────────────────────────── */}
-      <div className="p-6 space-y-6">
+      <div className="p-6 space-y-6" ref={reportRef} style={{ minHeight: '600px', backgroundColor: 'var(--bg-base)' }}>
 
         {/* ════════════ ABC ANALYSIS TAB ════════════ */}
         {activeTab === 'abc' && (
