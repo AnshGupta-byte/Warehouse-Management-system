@@ -13,7 +13,7 @@ export const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScan, onClose 
   const [error, setError] = useState('');
   const [lastResult, setLastResult] = useState('');
   const [flash, setFlash] = useState(false);
-  const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleDetected = useCallback(
     (result: any) => {
